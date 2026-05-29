@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 開機日｜蘆洲監理所 · 授課導覽台</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --sidebar-bg:#f6f8f2;
+    --text:#2f3a26;
+    --text-soft:#6d7a60;
+    --line:#e6ece0;
+    --accent:#5b8a36;        /* 幸運草綠強調色 */
+    --accent-dark:#3d5e26;   /* 深綠標題色 */
+    --accent-soft:#eef5e6;
+    --card-bg:#f6f8f2;
+    --active-bg:#e9f2dd;
+    --prompt-bg:#2f3a26;     /* 提示詞深綠框 */
+    --prompt-text:#f3f6ee;
+    --radius:14px;
+    --maxw:780px;
+    --sidebar-w:300px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"PingFang TC","Heiti TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    line-height:1.78;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .layout{display:flex;min-height:100vh;}
+
+  /* ===== 左側目錄 ===== */
+  .sidebar{
+    width:var(--sidebar-w);
+    background:var(--sidebar-bg);
+    border-right:1px solid var(--line);
+    padding:26px 16px 60px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;
+  }
+  .brand{display:flex;align-items:center;gap:8px;margin:0 8px 2px;}
+  .brand h1{font-size:17px;margin:0;letter-spacing:.5px;color:var(--accent-dark);}
+  .sidebar .subtitle{font-size:12px;color:var(--text-soft);margin:4px 8px 18px;}
+  .search-box{
+    width:100%;border:1px solid var(--line);border-radius:10px;
+    padding:9px 12px;font-size:13.5px;margin-bottom:16px;background:#fff;outline:none;
+  }
+  .search-box:focus{border-color:var(--accent);}
+  .nav-group-title{
+    font-size:11px;font-weight:800;color:var(--accent);letter-spacing:1.5px;
+    margin:18px 8px 6px;
+  }
+  .nav-item{
+    display:flex;align-items:baseline;gap:7px;
+    padding:7px 10px;margin:1px 0;border-radius:9px;color:var(--text);
+    text-decoration:none;font-size:13.7px;cursor:pointer;border:1px solid transparent;
+    transition:background .15s,border-color .15s;
+  }
+  .nav-item:hover{background:#edf1e6;}
+  .nav-item.active{background:var(--active-bg);border-color:#cfe0b8;color:var(--accent-dark);font-weight:700;}
+  .nav-item .num{color:var(--accent);font-variant-numeric:tabular-nums;font-size:12px;opacity:.85;min-width:18px;}
+
+  /* ===== 主內容 ===== */
+  .main{flex:1;padding:0 0 120px;min-width:0;}
+  .content-wrap{max-width:var(--maxw);margin:0 auto;padding:0 36px;}
+  .page-header{padding:54px 0 28px;border-bottom:1px solid var(--line);margin-bottom:10px;}
+  .page-header .eyebrow{color:var(--accent);font-size:13px;font-weight:800;letter-spacing:1px;}
+  .page-header h2{font-size:32px;margin:8px 0 10px;line-height:1.3;color:var(--accent-dark);}
+  .page-header p{color:var(--text-soft);margin:0;font-size:15px;}
+
+  section.fragment{padding:36px 0;border-bottom:1px solid var(--line);scroll-margin-top:20px;}
+  section.fragment:last-child{border-bottom:none;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .pill{font-size:12px;font-weight:700;padding:3px 11px;border-radius:999px;}
+  .pill.time{background:#eef2e8;color:var(--text-soft);}
+  .pill.tag{background:var(--accent-soft);color:var(--accent);}
+  .pill.tool{background:#fff;border:1px solid var(--accent);color:var(--accent);}
+  .fragment h3{font-size:24px;margin:0 0 14px;line-height:1.4;color:var(--accent-dark);}
+  .fragment h3 .num{color:var(--accent);margin-right:10px;font-variant-numeric:tabular-nums;}
+  .fragment .body{font-size:15.5px;}
+  .fragment .body p{margin:0 0 13px;}
+  .fragment .body ul{margin:0 0 13px;padding-left:22px;}
+  .fragment .body li{margin:5px 0;}
+  .fragment .body strong{color:var(--accent-dark);}
+  .hl{background:#fdf3b8;padding:1px 4px;border-radius:4px;}
+
+  /* 講解重點卡片 */
+  .keycard{background:var(--card-bg);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:var(--radius);padding:16px 20px;margin:18px 0 4px;}
+  .keycard .keycard-title{font-weight:800;font-size:13.5px;margin:0 0 8px;color:var(--accent);}
+  .keycard ul{margin:0;padding-left:20px;}
+  .keycard li{margin:5px 0;font-size:14.5px;}
+
+  /* 提示詞框（深綠，可複製） */
+  .prompt{position:relative;background:var(--prompt-bg);color:var(--prompt-text);
+    border-radius:12px;padding:16px 18px 16px;margin:14px 0;font-size:14.5px;line-height:1.7;}
+  .prompt .plabel{font-size:11.5px;font-weight:700;letter-spacing:.5px;color:#bcd49a;
+    text-transform:uppercase;margin-bottom:7px;padding-right:64px;}
+  .prompt .ptext{white-space:pre-wrap;}
+  .copy-btn{position:absolute;top:12px;right:12px;background:#fff;color:var(--accent-dark);
+    border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;
+    font-family:inherit;transition:background .15s;}
+  .copy-btn:hover{background:#eef5e6;}
+  .copy-btn.done{background:#cfe8b3;}
+
+  /* 示範連結 */
+  .demo{display:inline-flex;align-items:center;gap:7px;margin:4px 0;padding:9px 16px;
+    border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;
+    background:var(--accent);color:#fff;border:none;cursor:pointer;font-family:inherit;}
+  .demo.todo{background:#fff;color:var(--text-soft);border:1px dashed #c2cbb4;cursor:default;}
+
+  /* ===== 行動裝置 ===== */
+  .menu-toggle{display:none;position:fixed;top:14px;left:14px;z-index:30;background:#fff;
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:16px;cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);font-family:inherit;}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:18;}
+  @media(max-width:880px){
+    .menu-toggle{display:block;}
+    .sidebar{position:fixed;z-index:20;left:0;top:0;transform:translateX(-100%);
+      transition:transform .25s;box-shadow:2px 0 16px rgba(0,0,0,.1);}
+    .sidebar.open{transform:translateX(0);}
+    .overlay.show{display:block;}
+    .content-wrap{padding:0 20px;}
+    .page-header{padding-top:64px;}
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰ 目錄</button>
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span>🍀</span><h1 id="siteTitle"></h1></div>
+    <p class="subtitle" id="siteSubtitle"></p>
+    <input type="text" class="search-box" id="searchBox" placeholder="搜尋段落…">
+    <nav id="navList"></nav>
+  </aside>
+
+  <main class="main">
+    <div class="content-wrap">
+      <header class="page-header">
+        <div class="eyebrow" id="headerEyebrow"></div>
+        <h2 id="headerTitle"></h2>
+        <p id="headerDesc"></p>
+      </header>
+      <div id="contentArea"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* =========================================================
+   內容設定區 —— 要新增/修改內容，只改下面這塊
+   ---------------------------------------------------------
+   每個段落欄位：
+     group     左側目錄分組
+     num       編號 "01"
+     navTitle  目錄短標題
+     title     段落大標
+     time      時間徽章，如 "12–20 分"（可省略）
+     tag       主題標籤（可省略）
+     tool      用到的工具，如 "Gem 01｜破冰"（可省略）
+     body      講解內容 HTML：<p> <ul><li> <strong> <span class="hl">重點</span>
+     prompts   可複製提示詞 [{label:"標題", text:"提示詞內容"}]（可省略）
+     demo      示範連結 {label:"按鈕字", url:"網址"}；url 留空會顯示「待補」
+     keypoints 講解重點條列 []（可省略）
+   ========================================================= */
+const site = {
+  title:"AI 開機日｜蘆洲監理所",
+  subtitle:"小D教練的授課導覽台 · 點目錄即講 · 慢慢來，比較快",
+  headerEyebrow:"蘆洲監理所專屬 · 零基礎懶人包",
+  headerTitle:"AI 開機日",
+  headerDesc:"只要會滑手機，就學得會。50 分鐘，四個示範，帶你按下 AI 的開機鍵。"
+};
+
+const sections = [
+  /* ============ 開場 ============ */
+  {
+    group:"開場", num:"00", navTitle:"開場白", title:"開場白：只要會滑手機，就學得會",
+    time:"0–8 分", tag:"純講",
+    body:`<p>大家好，我是小D教練。今天這堂課很單純，<span class="hl">只要你會滑手機，就學得會</span>。</p>
+          <p>我不是工程師，我跟各位一樣是被工作追著跑的上班族，所以我只教<strong>明天就能用</strong>的東西。</p>
+          <p>其實啊，現在很多人都在偷偷用 AI，只是沒講出來而已。</p>`,
+    keypoints:["定調：不是技術課、不是程式課，是『交一個叫 AI 的新朋友』","降低防衛心：講師也是普通上班族","今天目標是『不再害怕』，不是變專家"]
+  },
+
+  /* ============ AI 是什麼 ============ */
+  {
+    group:"AI 是什麼", num:"01", navTitle:"AI 是文字計算機", title:"AI 是你桌上的「文字計算機」",
+    tag:"觀念",
+    body:`<p>你每天回信、發公告、寫簽呈——這些「跟文字有關」的工作，AI 就是你桌上的<strong>文字計算機</strong>。</p>
+          <p>以前要會寫程式才能用電腦；<span class="hl">現在只要會講人話就好</span>。</p>`,
+    keypoints:["用『計算機』比喻：算數字的工具 vs 處理文字的工具","連結公務日常：回信、公告、簽呈"]
+  },
+  {
+    group:"AI 是什麼", num:"02", navTitle:"蘋果比喻", title:"AI 聽得懂「前後文」——蘋果比喻",
+    tag:"觀念",
+    body:`<p>我說「我要買蘋果」：</p>
+          <ul>
+            <li>你說<strong>肚子餓</strong> → 它知道是水果 🍎</li>
+            <li>你說<strong>螢幕摔壞</strong> → 它知道是手機 📱</li>
+          </ul>
+          <p>它聽得懂前後文，<span class="hl">就像人一樣</span>。這就是現在 AI 厲害的地方。</p>`,
+    keypoints:["這頁慢慢講，是全場『原來如此』的關鍵","重點不是技術，是『畫面感』"]
+  },
+  {
+    group:"AI 是什麼", num:"03", navTitle:"它能幫你四件事", title:"它能幫你做四件事",
+    tag:"觀念",
+    body:`<p>先記四個動詞就好：</p>
+          <ul>
+            <li>📝 <strong>整理</strong>｜一堆雜亂的字，它幫你理清楚</li>
+            <li>✏️ <strong>改寫</strong>｜寫得卡卡的，它幫你變順</li>
+            <li>🌐 <strong>翻譯</strong>｜中翻英、英翻中都行</li>
+            <li>💡 <strong>出點子</strong>｜沒靈感，它陪你想</li>
+          </ul>
+          <p>今天我們挑<strong>公務上最有用的</strong>來做。</p>`,
+    keypoints:["四個動詞是今天所有示範的骨架","熟了會發現遠不只這些"]
+  },
+  {
+    group:"AI 是什麼", num:"04", navTitle:"最重要的一句", title:"今天最重要的一句話",
+    tag:"金句",
+    body:`<p style="font-size:21px;font-weight:800;color:var(--accent-dark);text-align:center;margin:10px 0 16px;">AI 給的是草稿，定稿的人是你。</p>
+          <p>等一下每個示範，我都會回到這句。它是很厲害的實習生，<span class="hl">但核章的永遠是你</span>。</p>`,
+    keypoints:["這句要重複講三次以上","收尾會再回扣一次"]
+  },
+  {
+    group:"AI 是什麼", num:"05", navTitle:"兩個交通規則", title:"用 AI 的兩個交通規則",
+    tag:"安全",
+    body:`<ul>
+            <li>🔒 <strong>個資不要丟進去</strong>（民眾身分證、電話、案件細節）</li>
+            <li>🔍 <strong>它有時候會「幻覺」亂編</strong>——數字、法規、日期、金額，重要的自己要核</li>
+          </ul>`,
+    keypoints:["公部門場景特別強調個資","『幻覺』用白話講：它會一本正經地講錯"]
+  },
+
+  /* ============ 認識工具 ============ */
+  {
+    group:"認識工具", num:"06", navTitle:"辦公桌三神寶", title:"你的辦公桌三神寶",
+    time:"8–12 分", tag:"工具",
+    body:`<ul>
+            <li>🤖 <strong>ChatGPT</strong>｜最萬用、最好上手，你的主力</li>
+            <li>📒 <strong>NotebookLM</strong>｜只讀你給的資料、<span class="hl">不會自己亂編</span>，最會整理長檔案</li>
+            <li>✨ <strong>Gemini</strong>｜Google 的好夥伴，可以做「Gem」小幫手</li>
+          </ul>
+          <p>簡單記：要創意找 Gemini／ChatGPT；要整理長檔案、不能亂編，找 NotebookLM。</p>`,
+    keypoints:["今天主要用 Gemini（因為能做 Gem）","三個不用全學，先把一個玩熟"]
+  },
+  {
+    group:"認識工具", num:"07", navTitle:"登入 + 什麼是 Gem", title:"登入 Gemini ＋ 什麼是 Gem",
+    time:"8–12 分", tag:"操作",
+    body:`<p>大家先用手機掃 QR、用 <strong>Google 帳號</strong>登入 Gemini。</p>
+          <p><strong>Gem 是什麼？</strong>就是把一段指令「烙印」在 AI 身上的小幫手——<span class="hl">點開就用，不用每次重打提示詞</span>。今天的四個示範都用預設好的 Gem。</p>`,
+    demo:{label:"Gemini 登入連結（待補）", url:""},
+    keypoints:["確認大家都登入成功再往下","強調 Gem 的好處：點一下就用"]
+  },
+  {
+    group:"認識工具", num:"08", navTitle:"今天的四個寶箱", title:"今天挑戰四個寶箱",
+    time:"8–12 分", tag:"地圖",
+    body:`<p>今天我們開四個寶箱：</p>
+          <ul>
+            <li>① <strong>破冰</strong>｜第一次跟 AI 對話</li>
+            <li>② <strong>公文回覆</strong>｜回民眾留言</li>
+            <li>③ <strong>櫃台口譯</strong>｜外國民眾雙向翻譯</li>
+            <li>④ <strong>會議記錄</strong>｜錄音變正式記錄</li>
+          </ul>
+          <p>走，第一個。<span style="color:var(--text-soft);">【操作】切到筆電的 Gemini 畫面。</span></p>`,
+    keypoints:["先給全貌，學員心裡有底","四個示範一定保住，時間不夠砍其他"]
+  },
+
+  /* ============ 四個現場示範 ============ */
+  {
+    group:"四個現場示範", num:"09", navTitle:"示範一：破冰", title:"示範一：破冰交朋友",
+    time:"12–20 分", tag:"示範", tool:"Gem 01｜破冰交朋友",
+    body:`<p>第一次用 AI，最難的不是不會，是<strong>不敢按</strong>。我們先讓它自我介紹破冰。</p>
+          <p>它還可以<span class="hl">用講的</span>——點麥克風直接說就好，不用打字。</p>`,
+    prompts:[
+      {label:"開場破冰", text:"你好，我是新朋友，請用台灣口語，三句話介紹你自己。"},
+      {label:"問自己的事", text:"我明天要請半天假，幫我想一句簡單的請假理由。"}
+    ],
+    demo:{label:"破冰 Gem 連結（待補）", url:""},
+    keypoints:["示範重點：三句話、講人話、不囉嗦","秀麥克風語音輸入，讓不會打字的人安心"]
+  },
+  {
+    group:"四個現場示範", num:"10", navTitle:"提示語觀念", title:"為什麼有時候答得像廢話？",
+    time:"20–22 分", tag:"觀念",
+    body:`<p>因為你問得太模糊。你說「幫我寫公告」，它不知道<strong>給誰看、什麼語氣</strong>，只好亂寫一通。</p>
+          <p>記這個萬用公式，講越清楚它幫越多：</p>
+          <p style="text-align:center;font-weight:800;color:var(--accent-dark);font-size:18px;">角色 · 任務 · 格式 · 限制 · 背景</p>`,
+    keypoints:["承上啟下：接著的公文示範就是照這公式","跟講義『四個溝通秘訣』是同一件事的兩種講法"]
+  },
+  {
+    group:"四個現場示範", num:"11", navTitle:"示範二：公文回覆", title:"示範二：公文回覆",
+    time:"22–32 分", tag:"示範", tool:"Gem 02｜公文回覆小幫手",
+    body:`<p>同一件事，跟同事講三句就完，要寫成回民眾的公文就卡住——不是你不會寫，是「講話」跟「公文」是兩種語言。這個小幫手<strong>會兩種語言</strong>。</p>
+          <p>重點：它<span class="hl">沒有自己編規定</span>，該填的留空給你。因為最後核章的是你。</p>`,
+    prompts:[
+      {label:"回民眾臉書留言", text:"幫我回覆一位民眾的臉書留言。他抱怨遺失駕照來補辦，手續太繁瑣、排隊很久。語氣委婉溫暖，先安撫再說明，分「同理安撫」「應備文件」兩段，文件我之後自己填。"},
+      {label:"一次生多版本（時間夠才做）", text:"一次生多版本。事情是：下週三系統維護暫停服務一天。分別給主管、給同事、給民眾三個版本。"}
+    ],
+    demo:{label:"公文示範連結（待補）", url:""},
+    keypoints:["示範重點：先安撫情緒，再說明流程","它把規定留空 → 回扣『AI 給草稿，你定稿』","多版本是加碼，時間緊可省"]
+  },
+  {
+    group:"四個現場示範", num:"12", navTitle:"示範三：櫃台口譯", title:"示範三：櫃台口譯（雙向）",
+    time:"32–40 分", tag:"示範", tool:"Gem 03｜櫃台口譯小幫手",
+    body:`<p>外國人來問駕照，以前都趕快找會講英文的同事。現在讓手機當<strong>雙向翻譯機</strong>。</p>
+          <p>一支手機，一來一回，<span class="hl">不用再到處找人</span>。</p>`,
+    prompts:[
+      {label:"中翻英（我問對方）", text:"請問您要辦國際駕照，還是換發台灣駕照？"},
+      {label:"英翻中（對方回我）", text:"I want to exchange my US license. What documents do I need?"}
+    ],
+    demo:{label:"口譯 Gem 連結（待補）", url:""},
+    keypoints:["示範一來一回：中→英拿給對方看，英→中我看懂","強調雙向、即時、用手機就行"]
+  },
+  {
+    group:"四個現場示範", num:"13", navTitle:"示範四：會議記錄", title:"示範四：會議記錄",
+    time:"40–48 分", tag:"示範", tool:"Gem 04｜會議記錄 ＋ NotebookLM",
+    body:`<p>開會不怕，怕的是會後那份記錄要聽打，兩小時錄音聽打要花整個下午。</p>
+          <p><strong>關鍵流程：</strong>錄音檔先變文字，AI 才能整理。</p>
+          <ul>
+            <li><strong>NotebookLM</strong>：最會吃錄音、長檔案，<span class="hl">只根據你給的內容、不亂編</span> → 負責轉逐字稿</li>
+            <li><strong>會議記錄 Gem</strong>：把逐字稿排版成正式記錄 → 負責整理</li>
+          </ul>
+          <p>兩個搭配用：NotebookLM 吃錄音轉逐字稿，Gem 排版整理。</p>`,
+    prompts:[
+      {label:"NotebookLM 整理重點", text:"幫我整理這份會議的重點。"},
+      {label:"會議記錄 Gem（貼逐字稿後）", text:"請整理成正式會議記錄，包含日期、與會人員、討論主題、決議事項、後續分工，用台灣公文口吻。"}
+    ],
+    demo:{label:"會議記錄示範連結（待補）", url:""},
+    keypoints:["展示 NotebookLM：來源區上傳、對話區問、Studio 出東西","30 秒生出有日期、決議、分工的正式記錄","時間不夠可砍 NotebookLM Studio 細項"]
+  },
+
+  /* ============ 收尾 ============ */
+  {
+    group:"收尾", num:"14", navTitle:"收尾 + 安全提醒", title:"收尾 ＋ 安全提醒",
+    time:"48–50 分", tag:"純講",
+    body:`<p>50 分鐘前你可能還覺得 AI 離你很遠。現在你會跟它對話、會用它寫公文回民眾、會用手機當口譯、會用它做會議記錄。</p>
+          <p>最後再講一次今天最重要的那句：<span class="hl">AI 給的是草稿，定稿的人是你。</span></p>
+          <p>個資不要丟、法規數字自己核。它是很厲害的實習生，但你永遠是核章的人。</p>
+          <p style="font-weight:800;color:var(--accent-dark);text-align:center;font-size:19px;margin-top:16px;">慢慢來，比較快。🍀</p>`,
+    keypoints:["回顧今天四個能力，給成就感","回扣金句與兩個交通規則作結"]
+  },
+  {
+    group:"收尾", num:"15", navTitle:"回家練習任務", title:"回家練習任務（挑一個就好）",
+    tag:"帶回家",
+    body:`<ul>
+            <li>🔍 <strong>任務一｜今晚吃什麼</strong>：跟 AI 說冰箱有什麼，請它給晚餐建議</li>
+            <li>✉️ <strong>任務二｜寫一則訊息</strong>：請它幫你寫一則 Line 訊息給家人或同事</li>
+            <li>🔁 <strong>任務三｜越聊越好</strong>：拿到答案後回它「太長了」「再簡單一點」，看它怎麼改</li>
+          </ul>
+          <p>做完一個，你就又進步了一點。<span class="hl">不用怕問錯，AI 最喜歡愛嘗試的人。</span></p>`,
+    keypoints:["強調挑一個就好，降低壓力"]
+  },
+  {
+    group:"收尾", num:"16", navTitle:"常見問題 FAQ", title:"常見問題與不挫折提醒",
+    tag:"FAQ",
+    body:`<ul>
+            <li><strong>它回答錯了怎麼辦？</strong> 很正常，AI 會出錯。重要的數字、法規自己再查一次。它給草稿，你定稿。</li>
+            <li><strong>它聽不懂我在說什麼？</strong> 把話講更清楚，補上「對象、內容、語氣」，或開新對話重講一次。</li>
+            <li><strong>免費的夠用嗎？</strong> 今天教的這些，免費版完全夠用。</li>
+            <li><strong>我會不會把它弄壞？</strong> 不會。大膽問、大膽試，問錯也不會怎樣。</li>
+          </ul>`,
+    keypoints:["這頁是現場 Q&A 的後備答案"]
+  },
+
+  /* ============ 帶得走 ============ */
+  {
+    group:"帶得走的工具", num:"17", navTitle:"5 隻 Gem 小幫手", title:"帶著走的 Gem 小幫手",
+    tag:"資源",
+    body:`<p>除了今天教的，小D還做了現成的 Gem，點連結自動加到你帳號，<strong>不用記指令</strong>：</p>
+          <ul>
+            <li>📝 <strong>會議記錄員</strong>｜錄音/逐字稿 → 正式會議記錄</li>
+            <li>📋 <strong>公文白話翻譯機</strong>｜生硬公文 → 民眾聽得懂的白話</li>
+            <li>🌐 <strong>櫃台口譯</strong>｜中英雙向即時翻譯</li>
+            <li>📚 <strong>小孩英文家教</strong>｜引導式教學，不直接給答案</li>
+            <li>🥗 <strong>媽媽的營養師</strong>｜拍餐點 → 熱量與飲食建議</li>
+          </ul>`,
+    demo:{label:"Gem 分享連結合集（待補）", url:""},
+    keypoints:["課堂只快速帶過、不示範","引導：回家點講義連結自動加入帳號"]
+  },
+  {
+    group:"帶得走的工具", num:"18", navTitle:"想學更多", title:"想學更多？這只是開始",
+    tag:"延伸",
+    body:`<p>如果今天讓你覺得「還想學更多」，後面還有 AI 在各行各業的完整應用地圖。慢慢看，不用急。</p>
+          <p style="font-weight:800;color:var(--accent-dark);text-align:center;font-size:19px;margin-top:14px;">今天你按下了 AI 的開機鍵。<br>接下來這條路，慢慢走，會越走越寬。</p>
+          <p style="text-align:center;color:var(--text-soft);">🍀 Learn AI with Tarshar｜2026</p>`,
+    demo:{label:"AI 完整應用地圖（待補）", url:""},
+    keypoints:["種下『想知道更多』的火種","導向後續課程／訂閱"]
+  },
+
+  /* ============ 講師備忘（自己看） ============ */
+  {
+    group:"講師備忘", num:"19", navTitle:"臨場應變表", title:"臨場應變表",
+    tag:"講師用",
+    body:`<ul>
+            <li><strong>AI 當天回應慢/不穩</strong> → 改點課前跑好的連結，不要硬等</li>
+            <li><strong>時間超過</strong> → 砍 NotebookLM Studio 細項，四個示範一定保住</li>
+            <li><strong>學員想自己試</strong> → 「這份帶回家自己玩有完整食譜」，現場以看為主</li>
+            <li><strong>有人問非公務玩法</strong> → 「那些回家補充教材裡都有，今天先專心工作用得到的」</li>
+            <li><strong>有人問費用</strong> → 「基本功能免費，夠你日常用」</li>
+          </ul>`,
+    keypoints:[]
+  },
+  {
+    group:"講師備忘", num:"20", navTitle:"課前檢查清單", title:"課前 30 分鐘檢查清單",
+    tag:"講師用",
+    body:`<ul>
+            <li>☐ 筆電接上螢幕（HDMI 轉接頭），畫面正常</li>
+            <li>☐ Gemini 已登入，四個 Gem 都在、各點開測一次</li>
+            <li>☐ 公文示範、口譯示範、會議記錄示範的連結都能開</li>
+            <li>☐ 簡報翻到封面待命</li>
+            <li>☐ 跟站長碰面討論宣導圖</li>
+          </ul>`,
+    keypoints:[]
+  }
+];
+
+/* ===== 渲染邏輯（一般不用更動） ===== */
+(function(){
+  document.getElementById('siteTitle').textContent = site.title;
+  document.getElementById('siteSubtitle').textContent = site.subtitle;
+  document.getElementById('headerEyebrow').textContent = site.headerEyebrow;
+  document.getElementById('headerTitle').textContent = site.headerTitle;
+  document.getElementById('headerDesc').textContent = site.headerDesc;
+  document.title = site.title;
+
+  const nav = document.getElementById('navList');
+  const content = document.getElementById('contentArea');
+  let lastGroup = null;
+
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  sections.forEach((s,i)=>{
+    const id = "sec-"+i;
+    if(s.group !== lastGroup){
+      const gt = document.createElement('div');
+      gt.className='nav-group-title'; gt.textContent=s.group; nav.appendChild(gt);
+      lastGroup=s.group;
+    }
+    const a=document.createElement('a');
+    a.className='nav-item'; a.href='#'+id; a.dataset.target=id;
+    a.dataset.search=(s.navTitle+' '+s.title+' '+s.body+' '+(s.prompts||[]).map(p=>p.text).join(' ')).toLowerCase();
+    a.innerHTML=(s.num?'<span class="num">'+s.num+'</span>':'')+'<span>'+s.navTitle+'</span>';
+    nav.appendChild(a);
+
+    const sec=document.createElement('section');
+    sec.className='fragment'; sec.id=id;
+    let h='';
+    // 徽章列
+    let meta='';
+    if(s.time) meta+='<span class="pill time">⏱ '+s.time+'</span>';
+    if(s.tag)  meta+='<span class="pill tag">'+s.tag+'</span>';
+    if(s.tool) meta+='<span class="pill tool">'+s.tool+'</span>';
+    if(meta) h+='<div class="meta-row">'+meta+'</div>';
+    h+='<h3>'+(s.num?'<span class="num">'+s.num+'</span>':'')+s.title+'</h3>';
+    h+='<div class="body">'+s.body+'</div>';
+    // 提示詞
+    if(s.prompts && s.prompts.length){
+      s.prompts.forEach(p=>{
+        h+='<div class="prompt"><button class="copy-btn">複製</button>'+
+           '<div class="plabel">📋 '+esc(p.label)+'</div>'+
+           '<div class="ptext">'+esc(p.text)+'</div></div>';
+      });
+    }
+    // 示範連結
+    if(s.demo){
+      if(s.demo.url) h+='<a class="demo" href="'+s.demo.url+'" target="_blank">▶ '+esc(s.demo.label)+'</a>';
+      else h+='<span class="demo todo">🔗 '+esc(s.demo.label)+'</span>';
+    }
+    // 講解重點
+    if(s.keypoints && s.keypoints.length){
+      h+='<div class="keycard"><div class="keycard-title">🎯 講解重點</div><ul>'+
+         s.keypoints.map(k=>'<li>'+k+'</li>').join('')+'</ul></div>';
+    }
+    sec.innerHTML=h;
+    content.appendChild(sec);
+  });
+
+  // 複製按鈕
+  content.addEventListener('click',e=>{
+    const btn=e.target.closest('.copy-btn');
+    if(!btn) return;
+    const text=btn.parentElement.querySelector('.ptext').textContent;
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='已複製 ✓'; btn.classList.add('done');
+      setTimeout(()=>{btn.textContent='複製';btn.classList.remove('done');},1500);
+    });
+  });
+
+  // 捲動高亮
+  const items=[...document.querySelectorAll('.nav-item')];
+  const secEls=[...document.querySelectorAll('section.fragment')];
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(en=>{ if(en.isIntersecting){
+      items.forEach(it=>it.classList.toggle('active',it.dataset.target===en.target.id));
+    }});
+  },{rootMargin:"-20% 0px -70% 0px"});
+  secEls.forEach(el=>obs.observe(el));
+
+  // 搜尋
+  const search=document.getElementById('searchBox');
+  search.addEventListener('input',()=>{
+    const q=search.value.trim().toLowerCase();
+    items.forEach(it=>{it.style.display=(!q||it.dataset.search.includes(q))?'flex':'none';});
+  });
+
+  // 手機目錄
+  const sidebar=document.getElementById('sidebar');
+  const overlay=document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click',()=>{sidebar.classList.add('open');overlay.classList.add('show');});
+  function close(){sidebar.classList.remove('open');overlay.classList.remove('show');}
+  overlay.addEventListener('click',close);
+  nav.addEventListener('click',e=>{if(e.target.closest('.nav-item'))close();});
+})();
+</script>
+</body>
+</html>
