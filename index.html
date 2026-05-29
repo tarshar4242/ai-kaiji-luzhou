@@ -82,6 +82,16 @@
   .pill.tool{background:#fff;border:1px solid var(--accent);color:var(--accent);}
   .fragment h3{font-size:24px;margin:0 0 14px;line-height:1.4;color:var(--accent-dark);}
   .fragment h3 .num{color:var(--accent);margin-right:10px;font-variant-numeric:tabular-nums;}
+
+  /* 投影片圖（簡報感來源，仿參考頁 16:9 嵌圖） */
+  .slide-shot{position:relative;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;
+    border:1px solid var(--line);margin:0 0 18px;background:#f3f6ee;box-shadow:0 2px 10px rgba(47,58,38,.06);}
+  .slide-shot img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;}
+  /* 點圖放大檢視 */
+  .lightbox{display:none;position:fixed;inset:0;z-index:50;background:rgba(20,26,16,.92);
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+  .lightbox.show{display:flex;}
+  .lightbox img{max-width:96vw;max-height:92vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.4);}
   .fragment .body{font-size:15.5px;}
   .fragment .body p{margin:0 0 13px;}
   .fragment .body ul{margin:0 0 13px;padding-left:22px;}
@@ -164,10 +174,11 @@
      num       編號 "01"
      navTitle  目錄短標題
      title     段落大標
+     img       投影片圖路徑，如 "slides/slide-01.jpg"（可省略；放在解說上方，仿參考頁簡報感）
      time      時間徽章，如 "12–20 分"（可省略）
      tag       主題標籤（可省略）
      tool      用到的工具，如 "Gem 01｜破冰"（可省略）
-     body      講解內容 HTML：<p> <ul><li> <strong> <span class="hl">重點</span>
+     body      講解內容 HTML：<p> <ul><li> <strong> <span class="hl">重點</span>（可省略，圖已說明時可不寫）
      prompts   可複製提示詞 [{label:"標題", text:"提示詞內容"}]（可省略）
      demo      示範連結 {label:"按鈕字", url:"網址"}；url 留空會顯示「待補」
      keypoints 講解重點條列 []（可省略）
@@ -175,246 +186,304 @@
 const site = {
   title:"AI 開機日｜蘆洲監理所",
   subtitle:"小D教練的授課導覽台 · 點目錄即講 · 慢慢來，比較快",
-  headerEyebrow:"蘆洲監理所專屬 · 零基礎懶人包",
+  headerEyebrow:"蘆洲監理所專屬 · 零基礎手機入門",
   headerTitle:"AI 開機日",
-  headerDesc:"只要會滑手機，就學得會。50 分鐘，四個示範，帶你按下 AI 的開機鍵。"
+  headerDesc:"只要會滑手機，就學得會。跟著投影片，一步步按下 AI 的開機鍵。"
 };
 
 const sections = [
   /* ============ 開場 ============ */
   {
-    group:"開場", num:"00", navTitle:"開場白", title:"開場白：只要會滑手機，就學得會",
-    time:"0–8 分", tag:"純講",
-    body:`<p>大家好，我是小D教練。今天這堂課很單純，<span class="hl">只要你會滑手機，就學得會</span>。</p>
-          <p>我不是工程師，我跟各位一樣是被工作追著跑的上班族，所以我只教<strong>明天就能用</strong>的東西。</p>
-          <p>其實啊，現在很多人都在偷偷用 AI，只是沒講出來而已。</p>`,
-    keypoints:["定調：不是技術課、不是程式課，是『交一個叫 AI 的新朋友』","降低防衛心：講師也是普通上班族","今天目標是『不再害怕』，不是變專家"]
+    group:"開場", num:"00", navTitle:"封面", title:"AI 開機日：手把手零基礎入門",
+    img:"slides/slide-01.jpg", tag:"封面",
+    body:`<p>慢慢來，比較快，我們一起來玩。<span class="hl">只要你會滑手機，今天就學得會。</span></p>`,
+    keypoints:["定調：不是技術課、不是程式課，是來交一個叫 AI 的新朋友","今天目標是『不再害怕』，不是變專家"]
+  },
+  {
+    group:"開場", num:"01", navTitle:"我是誰", title:"我是誰：小D教練",
+    img:"slides/slide-02.jpg", tag:"破冰",
+    body:`<p>我不是工程師，我跟各位一樣是被工作追著跑的上班族，所以我只教<strong>明天就能用</strong>的東西。</p>`,
+    keypoints:["降低防衛心：講師也是普通上班族","拉近距離，讓大家放鬆"]
   },
 
   /* ============ AI 是什麼 ============ */
   {
-    group:"AI 是什麼", num:"01", navTitle:"AI 是文字計算機", title:"AI 是你桌上的「文字計算機」",
-    tag:"觀念",
-    body:`<p>你每天回信、發公告、寫簽呈——這些「跟文字有關」的工作，AI 就是你桌上的<strong>文字計算機</strong>。</p>
-          <p>以前要會寫程式才能用電腦；<span class="hl">現在只要會講人話就好</span>。</p>`,
-    keypoints:["用『計算機』比喻：算數字的工具 vs 處理文字的工具","連結公務日常：回信、公告、簽呈"]
+    group:"AI 是什麼", num:"02", navTitle:"大家都在偷偷用", title:"原來大家都在偷偷用 AI",
+    img:"slides/slide-03.jpg", tag:"觀念",
+    body:`<p>不用寫程式，<span class="hl">會講話就能學會的日常魔法</span>。很多人早就在用，只是沒講出來而已。</p>`,
+    keypoints:["先讓大家覺得『我也可以』","破除 AI 很難、很遙遠的印象"]
   },
   {
-    group:"AI 是什麼", num:"02", navTitle:"蘋果比喻", title:"AI 聽得懂「前後文」——蘋果比喻",
-    tag:"觀念",
-    body:`<p>我說「我要買蘋果」：</p>
-          <ul>
-            <li>你說<strong>肚子餓</strong> → 它知道是水果 🍎</li>
-            <li>你說<strong>螢幕摔壞</strong> → 它知道是手機 📱</li>
-          </ul>
-          <p>它聽得懂前後文，<span class="hl">就像人一樣</span>。這就是現在 AI 厲害的地方。</p>`,
-    keypoints:["這頁慢慢講，是全場『原來如此』的關鍵","重點不是技術，是『畫面感』"]
+    group:"AI 是什麼", num:"03", navTitle:"文字計算機", title:"AI 是你桌上的「文字計算機」",
+    img:"slides/slide-04.jpg", tag:"觀念",
+    body:`<p>回信、發公告、寫簽呈，這些跟文字有關的工作，AI 就是你的<strong>文字計算機</strong>。</p>`,
+    keypoints:["用『計算機』比喻：算數字 vs 處理文字","連結公務日常：回信、公告、簽呈"]
   },
   {
-    group:"AI 是什麼", num:"03", navTitle:"它能幫你四件事", title:"它能幫你做四件事",
-    tag:"觀念",
-    body:`<p>先記四個動詞就好：</p>
-          <ul>
-            <li>📝 <strong>整理</strong>｜一堆雜亂的字，它幫你理清楚</li>
-            <li>✏️ <strong>改寫</strong>｜寫得卡卡的，它幫你變順</li>
-            <li>🌐 <strong>翻譯</strong>｜中翻英、英翻中都行</li>
-            <li>💡 <strong>出點子</strong>｜沒靈感，它陪你想</li>
-          </ul>
-          <p>今天我們挑<strong>公務上最有用的</strong>來做。</p>`,
+    group:"AI 是什麼", num:"04", navTitle:"會講人話就好", title:"以前要會程式，現在只要會講人話",
+    img:"slides/slide-05.jpg", tag:"觀念",
+    body:`<p>以前要會寫程式（Coding）才能用電腦；<span class="hl">現在只要會講人話（Speaking）就好</span>。</p>`,
+    keypoints:["強調門檻已經消失，人人可用"]
+  },
+  {
+    group:"AI 是什麼", num:"05", navTitle:"前後文・蘋果", title:"它聽得懂前後文（蘋果比喻）",
+    img:"slides/slide-06.jpg", tag:"觀念",
+    body:`<p>同樣說「我要買蘋果」：說<strong>肚子餓</strong>它知道是水果，說<strong>螢幕摔壞</strong>它知道是手機。<span class="hl">它聽得懂前後文，就像人一樣。</span></p>`,
+    keypoints:["這頁慢慢講，是全場『原來如此』的關鍵","重點不是技術，是畫面感"]
+  },
+
+  /* ============ AI 能幫你 ============ */
+  {
+    group:"AI 能幫你", num:"06", navTitle:"能幫你四件事", title:"它能幫你做四件事",
+    img:"slides/slide-07.jpg", tag:"觀念",
+    body:`<p>先記四個動詞就好：<strong>整理、改寫、翻譯、出點子</strong>。今天我們挑公務上最有用的來做。</p>`,
     keypoints:["四個動詞是今天所有示範的骨架","熟了會發現遠不只這些"]
   },
   {
-    group:"AI 是什麼", num:"04", navTitle:"最重要的一句", title:"今天最重要的一句話",
-    tag:"金句",
-    body:`<p style="font-size:21px;font-weight:800;color:var(--accent-dark);text-align:center;margin:10px 0 16px;">AI 給的是草稿，定稿的人是你。</p>
-          <p>等一下每個示範，我都會回到這句。它是很厲害的實習生，<span class="hl">但核章的永遠是你</span>。</p>`,
-    keypoints:["這句要重複講三次以上","收尾會再回扣一次"]
+    group:"AI 能幫你", num:"07", navTitle:"一秒變圓融", title:"職場防呆針：一秒把直白變圓融",
+    img:"slides/slide-08.jpg", tag:"應用",
+    body:`<p>心裡想的話太直接，貼出去會出事。讓 AI 當<strong>潤稿漏斗</strong>，把直白的話變得得體圓融。</p>`,
+    keypoints:["很有共鳴的痛點：話講太白會得罪人","現場可請學員出一句『想吐槽的話』來潤"]
   },
   {
-    group:"AI 是什麼", num:"05", navTitle:"兩個交通規則", title:"用 AI 的兩個交通規則",
-    tag:"安全",
-    body:`<ul>
-            <li>🔒 <strong>個資不要丟進去</strong>（民眾身分證、電話、案件細節）</li>
-            <li>🔍 <strong>它有時候會「幻覺」亂編</strong>——數字、法規、日期、金額，重要的自己要核</li>
-          </ul>`,
+    group:"AI 能幫你", num:"08", navTitle:"草稿你定稿", title:"AI 給的是草稿，定稿的人是你",
+    img:"slides/slide-09.jpg", tag:"金句",
+    body:`<p style="font-size:20px;font-weight:800;color:var(--accent-dark);text-align:center;margin:6px 0 12px;">AI 給的是草稿，定稿的人是你。</p>
+          <p>它是很厲害的實習生，<span class="hl">但核章的永遠是你</span>。</p>`,
+    keypoints:["這句要重複講三次以上","每個示範結束都回扣這句"]
+  },
+  {
+    group:"AI 能幫你", num:"09", navTitle:"安全注意事項", title:"AI 好用，但不可不知的注意事項",
+    img:"slides/slide-10.jpg", tag:"安全",
+    body:`<p>兩個交通規則：<strong>個資不要丟進去</strong>；<strong>它有時候會幻覺亂編</strong>，數字、法規、日期、金額重要的自己要核。</p>`,
     keypoints:["公部門場景特別強調個資","『幻覺』用白話講：它會一本正經地講錯"]
+  },
+
+  /* ============ 聰明用 AI ============ */
+  {
+    group:"聰明用 AI", num:"10", navTitle:"能力與算力", title:"AI 的「能力」計算方式變囉",
+    img:"slides/slide-11.jpg", tag:"觀念",
+    body:`<p>免費版、付費版能力不同。先了解它的力氣怎麼分配，才知道怎麼用最划算。</p>`,
+    keypoints:["不用講太細，重點是『免費版今天就夠用』"]
+  },
+  {
+    group:"聰明用 AI", num:"11", navTitle:"省算力習慣", title:"手機操作必學的 4 個省算力小習慣",
+    img:"slides/slide-12.jpg", tag:"操作",
+    body:`<p>四個小習慣，讓你用得更順、不浪費額度。</p>`,
+    keypoints:["實用小撇步，學員會想拍照記下來"]
   },
 
   /* ============ 認識工具 ============ */
   {
-    group:"認識工具", num:"06", navTitle:"辦公桌三神寶", title:"你的辦公桌三神寶",
-    time:"8–12 分", tag:"工具",
-    body:`<ul>
-            <li>🤖 <strong>ChatGPT</strong>｜最萬用、最好上手，你的主力</li>
-            <li>📒 <strong>NotebookLM</strong>｜只讀你給的資料、<span class="hl">不會自己亂編</span>，最會整理長檔案</li>
-            <li>✨ <strong>Gemini</strong>｜Google 的好夥伴，可以做「Gem」小幫手</li>
-          </ul>
-          <p>簡單記：要創意找 Gemini／ChatGPT；要整理長檔案、不能亂編，找 NotebookLM。</p>`,
-    keypoints:["今天主要用 Gemini（因為能做 Gem）","三個不用全學，先把一個玩熟"]
+    group:"認識工具", num:"12", navTitle:"辦公桌三神寶", title:"你的辦公桌三神寶",
+    img:"slides/slide-13.jpg", tag:"工具",
+    body:`<p><strong>ChatGPT</strong> 最萬用好上手；<strong>NotebookLM</strong> 只讀你給的資料、不亂編；<strong>Gemini</strong> 可以做 Gem 小幫手。</p>`,
+    keypoints:["三個不用全學，先把一個玩熟","今天主要用 Gemini 與 NotebookLM"]
   },
   {
-    group:"認識工具", num:"07", navTitle:"登入 + 什麼是 Gem", title:"登入 Gemini ＋ 什麼是 Gem",
-    time:"8–12 分", tag:"操作",
-    body:`<p>大家先用手機掃 QR、用 <strong>Google 帳號</strong>登入 Gemini。</p>
-          <p><strong>Gem 是什麼？</strong>就是把一段指令「烙印」在 AI 身上的小幫手——<span class="hl">點開就用，不用每次重打提示詞</span>。今天的四個示範都用預設好的 Gem。</p>`,
-    demo:{label:"Gemini 登入連結（待補）", url:""},
-    keypoints:["確認大家都登入成功再往下","強調 Gem 的好處：點一下就用"]
-  },
-  {
-    group:"認識工具", num:"08", navTitle:"今天的四個寶箱", title:"今天挑戰四個寶箱",
-    time:"8–12 分", tag:"地圖",
-    body:`<p>今天我們開四個寶箱：</p>
-          <ul>
-            <li>① <strong>破冰</strong>｜第一次跟 AI 對話</li>
-            <li>② <strong>公文回覆</strong>｜回民眾留言</li>
-            <li>③ <strong>櫃台口譯</strong>｜外國民眾雙向翻譯</li>
-            <li>④ <strong>會議記錄</strong>｜錄音變正式記錄</li>
-          </ul>
-          <p>走，第一個。<span style="color:var(--text-soft);">【操作】切到筆電的 Gemini 畫面。</span></p>`,
-    keypoints:["先給全貌，學員心裡有底","四個示範一定保住，時間不夠砍其他"]
+    group:"認識工具", num:"13", navTitle:"雙神器大PK", title:"該用哪一個？AI 雙神器比較",
+    img:"slides/slide-14.jpg", tag:"工具",
+    body:`<p>一張表看懂什麼時候用哪一個。<span class="hl">要創意找 Gemini，要整理長檔案、不能亂編找 NotebookLM。</span></p>`,
+    keypoints:["不用逐格念，點出『各有所長』就好"]
   },
 
-  /* ============ 四個現場示範 ============ */
+  /* ============ 上手 Gemini ============ */
   {
-    group:"四個現場示範", num:"09", navTitle:"示範一：破冰", title:"示範一：破冰交朋友",
-    time:"12–20 分", tag:"示範", tool:"Gem 01｜破冰交朋友",
-    body:`<p>第一次用 AI，最難的不是不會，是<strong>不敢按</strong>。我們先讓它自我介紹破冰。</p>
-          <p>它還可以<span class="hl">用講的</span>——點麥克風直接說就好，不用打字。</p>`,
+    group:"上手 Gemini", num:"14", navTitle:"登入 Gemini", title:"第一站：登入 Gemini／ChatGPT",
+    img:"slides/slide-15.jpg", tag:"操作",
+    body:`<p>用手機掃 QR、用 <strong>Google 帳號</strong>登入。先確認大家都登入成功再往下。</p>`,
+    demo:{label:"Gemini 登入連結（待補）", url:""},
+    keypoints:["這裡會卡最多人，耐心等大家登入","可請已登入的學員幫旁邊的人"]
+  },
+  {
+    group:"上手 Gemini", num:"15", navTitle:"小D的五招", title:"小D 做的「五招」AI 魔法",
+    img:"slides/slide-16.jpg", tag:"地圖",
+    body:`<p>今天用五招現成的小幫手，<span class="hl">點開就用，不用每次重打提示詞</span>。先給全貌，學員心裡有底。</p>`,
+    keypoints:["先報全貌再逐招示範","時間不夠時，前面幾招一定保住"]
+  },
+
+  /* ============ Gemini 五招實作 ============ */
+  {
+    group:"Gemini 五招", num:"16", navTitle:"第1招・破冰", title:"第 1 招：第一次對話，動口不動手",
+    img:"slides/slide-17.jpg", tag:"示範", tool:"Prompt Card｜破冰",
+    body:`<p>第一次用 AI，最難的不是不會，是<strong>不敢按</strong>。先讓它自我介紹破冰，還能<span class="hl">用講的</span>，點麥克風直接說。</p>`,
     prompts:[
       {label:"開場破冰", text:"你好，我是新朋友，請用台灣口語，三句話介紹你自己。"},
       {label:"問自己的事", text:"我明天要請半天假，幫我想一句簡單的請假理由。"}
     ],
-    demo:{label:"破冰 Gem 連結（待補）", url:""},
     keypoints:["示範重點：三句話、講人話、不囉嗦","秀麥克風語音輸入，讓不會打字的人安心"]
   },
   {
-    group:"四個現場示範", num:"10", navTitle:"提示語觀念", title:"為什麼有時候答得像廢話？",
-    time:"20–22 分", tag:"觀念",
-    body:`<p>因為你問得太模糊。你說「幫我寫公告」，它不知道<strong>給誰看、什麼語氣</strong>，只好亂寫一通。</p>
-          <p>記這個萬用公式，講越清楚它幫越多：</p>
-          <p style="text-align:center;font-weight:800;color:var(--accent-dark);font-size:18px;">角色 · 任務 · 格式 · 限制 · 背景</p>`,
-    keypoints:["承上啟下：接著的公文示範就是照這公式","跟講義『四個溝通秘訣』是同一件事的兩種講法"]
+    group:"Gemini 五招", num:"17", navTitle:"為何答廢話", title:"為什麼 AI 給的答案像廢話？",
+    img:"slides/slide-18.jpg", tag:"觀念",
+    body:`<p>因為你問得太模糊。對比 <strong>NG 提問</strong>與 <strong>OK 提問</strong>，差別就在有沒有講清楚對象與語氣。</p>`,
+    keypoints:["現場各念一次 NG 與 OK 的問法","承上啟下，接著就是黃金公式"]
   },
   {
-    group:"四個現場示範", num:"11", navTitle:"示範二：公文回覆", title:"示範二：公文回覆",
-    time:"22–32 分", tag:"示範", tool:"Gem 02｜公文回覆小幫手",
-    body:`<p>同一件事，跟同事講三句就完，要寫成回民眾的公文就卡住——不是你不會寫，是「講話」跟「公文」是兩種語言。這個小幫手<strong>會兩種語言</strong>。</p>
-          <p>重點：它<span class="hl">沒有自己編規定</span>，該填的留空給你。因為最後核章的是你。</p>`,
+    group:"Gemini 五招", num:"18", navTitle:"黃金詠唱公式", title:"大師級「黃金詠唱公式」",
+    img:"slides/slide-19.jpg", tag:"心法",
+    body:`<p style="text-align:center;font-weight:800;color:var(--accent-dark);font-size:17px;margin:4px 0;">角色 · 任務 · 格式 · 限制 · 背景</p>
+          <p>講越清楚，它幫越多。這就是讓答案從廢話變精準的關鍵。</p>`,
+    keypoints:["這是全場最值得抄下來的一頁","用前一頁的例子套公式示範一次"]
+  },
+  {
+    group:"Gemini 五招", num:"19", navTitle:"公務日常演練", title:"實戰演練：公務日常一秒搞定",
+    img:"slides/slide-20.jpg", tag:"示範", tool:"公文回覆 ／ 櫃台口譯",
+    body:`<p>把公式用在真正的公務現場。下面兩組提示詞可以現場直接複製來跑：</p>`,
     prompts:[
-      {label:"回民眾臉書留言", text:"幫我回覆一位民眾的臉書留言。他抱怨遺失駕照來補辦，手續太繁瑣、排隊很久。語氣委婉溫暖，先安撫再說明，分「同理安撫」「應備文件」兩段，文件我之後自己填。"},
-      {label:"一次生多版本（時間夠才做）", text:"一次生多版本。事情是：下週三系統維護暫停服務一天。分別給主管、給同事、給民眾三個版本。"}
+      {label:"回民眾臉書留言（公文回覆）", text:"幫我回覆一位民眾的臉書留言。他抱怨遺失駕照來補辦，手續太繁瑣、排隊很久。語氣委婉溫暖，先安撫再說明，分「同理安撫」「應備文件」兩段，文件我之後自己填。"},
+      {label:"櫃台口譯・中翻英（我問對方）", text:"請問您要辦國際駕照，還是換發台灣駕照？"},
+      {label:"櫃台口譯・英翻中（對方回我）", text:"I want to exchange my US license. What documents do I need?"}
     ],
-    demo:{label:"公文示範連結（待補）", url:""},
-    keypoints:["示範重點：先安撫情緒，再說明流程","它把規定留空 → 回扣『AI 給草稿，你定稿』","多版本是加碼，時間緊可省"]
+    keypoints:["公文示範：先安撫情緒，再說明流程，規定留空回扣『你定稿』","口譯示範一來一回：中→英拿給對方看，英→中我看懂"]
   },
   {
-    group:"四個現場示範", num:"12", navTitle:"示範三：櫃台口譯", title:"示範三：櫃台口譯（雙向）",
-    time:"32–40 分", tag:"示範", tool:"Gem 03｜櫃台口譯小幫手",
-    body:`<p>外國人來問駕照，以前都趕快找會講英文的同事。現在讓手機當<strong>雙向翻譯機</strong>。</p>
-          <p>一支手機，一來一回，<span class="hl">不用再到處找人</span>。</p>`,
-    prompts:[
-      {label:"中翻英（我問對方）", text:"請問您要辦國際駕照，還是換發台灣駕照？"},
-      {label:"英翻中（對方回我）", text:"I want to exchange my US license. What documents do I need?"}
-    ],
-    demo:{label:"口譯 Gem 連結（待補）", url:""},
-    keypoints:["示範一來一回：中→英拿給對方看，英→中我看懂","強調雙向、即時、用手機就行"]
+    group:"Gemini 五招", num:"20", navTitle:"四個秘訣", title:"四個秘訣，一張記住",
+    img:"slides/slide-21.jpg", tag:"心法",
+    body:`<p>講清楚誰看、不要一直更新同個對話、卡住就開新對話、<span class="hl">重要的自己核</span>。四個秘訣一張收。</p>`,
+    keypoints:["這頁當作 Gemini 段落的小結"]
   },
   {
-    group:"四個現場示範", num:"13", navTitle:"示範四：會議記錄", title:"示範四：會議記錄",
-    time:"40–48 分", tag:"示範", tool:"Gem 04｜會議記錄 ＋ NotebookLM",
-    body:`<p>開會不怕，怕的是會後那份記錄要聽打，兩小時錄音聽打要花整個下午。</p>
-          <p><strong>關鍵流程：</strong>錄音檔先變文字，AI 才能整理。</p>
-          <ul>
-            <li><strong>NotebookLM</strong>：最會吃錄音、長檔案，<span class="hl">只根據你給的內容、不亂編</span> → 負責轉逐字稿</li>
-            <li><strong>會議記錄 Gem</strong>：把逐字稿排版成正式記錄 → 負責整理</li>
-          </ul>
-          <p>兩個搭配用：NotebookLM 吃錄音轉逐字稿，Gem 排版整理。</p>`,
+    group:"Gemini 五招", num:"21", navTitle:"第5招・會議解放", title:"第 5 招：工作解放，兩小時變兩分鐘",
+    img:"slides/slide-22.jpg", tag:"示範", tool:"會議記錄",
+    body:`<p>會後那份記錄要聽打，本來要花整個下午。讓 AI 把錄音變成正式記錄，<span class="hl">兩小時變兩分鐘</span>。</p>`,
     prompts:[
       {label:"NotebookLM 整理重點", text:"幫我整理這份會議的重點。"},
-      {label:"會議記錄 Gem（貼逐字稿後）", text:"請整理成正式會議記錄，包含日期、與會人員、討論主題、決議事項、後續分工，用台灣公文口吻。"}
+      {label:"會議記錄（貼逐字稿後）", text:"請整理成正式會議記錄，包含日期、與會人員、討論主題、決議事項、後續分工，用台灣公文口吻。"}
     ],
-    demo:{label:"會議記錄示範連結（待補）", url:""},
-    keypoints:["展示 NotebookLM：來源區上傳、對話區問、Studio 出東西","30 秒生出有日期、決議、分工的正式記錄","時間不夠可砍 NotebookLM Studio 細項"]
+    keypoints:["這招接到下一站 NotebookLM：先轉逐字稿再整理","強調省下的是『整個下午』"]
+  },
+
+  /* ============ NotebookLM 研究員 ============ */
+  {
+    group:"NotebookLM", num:"22", navTitle:"第二站・登入", title:"第二站：NotebookLM 專屬研究員",
+    img:"slides/slide-23.jpg", tag:"操作",
+    body:`<p>掃 QR 登入 NotebookLM，把資料上傳給它，它就變成<strong>只讀你資料</strong>的專屬研究員。</p>`,
+    demo:{label:"NotebookLM 連結（待補）", url:""},
+    keypoints:["強調：它只根據你給的內容回答，不亂編"]
+  },
+  {
+    group:"NotebookLM", num:"23", navTitle:"什麼是 NotebookLM", title:"什麼是 NotebookLM 工作室？",
+    img:"slides/slide-24.jpg", tag:"觀念",
+    body:`<p>它不是通用的聊天機器人，<span class="hl">是只讀你上傳資料的研究室</span>，所以最適合整理長檔案、會議錄音。</p>`,
+    keypoints:["對比 ChatGPT：一個天馬行空、一個只看你的資料"]
+  },
+  {
+    group:"NotebookLM", num:"24", navTitle:"丟資料烤洞察", title:"魔法比喻：丟進資料，烤出洞察",
+    img:"slides/slide-25.jpg", tag:"觀念",
+    body:`<p>像果汁機：丟進一堆資料，它幫你打成好喝的洞察。<span class="hl">資料越完整，洞察越準。</span></p>`,
+    keypoints:["用生活比喻降低距離感"]
+  },
+  {
+    group:"NotebookLM", num:"25", navTitle:"黃金版位", title:"必認！NotebookLM 黃金版位",
+    img:"slides/slide-26.jpg", tag:"操作",
+    body:`<p>三個區塊先認得：<strong>來源區</strong>（上傳資料）、<strong>對話區</strong>（問問題）、<strong>Studio 工作室</strong>（產出成品）。</p>`,
+    keypoints:["畫面對照著講，學員才不會迷路"]
+  },
+
+  /* ============ NotebookLM 九種神器 ============ */
+  {
+    group:"NotebookLM 九種神器", num:"26", navTitle:"①語音摘要", title:"神器 ①：語音摘要",
+    img:"slides/slide-27.jpg", tag:"Studio",
+    body:`<p>把資料變成像 Podcast 的雙人對談，<span class="hl">通勤、做家事用聽的就能複習</span>。</p>`,
+    keypoints:["現場放一小段語音，效果最驚艷"]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"27", navTitle:"②簡報", title:"神器 ②：簡報",
+    img:"slides/slide-28.jpg", tag:"Studio",
+    body:`<p>把長資料自動整理成一份簡報雛形，<strong>開會、報告省一半時間</strong>。</p>`,
+    keypoints:[]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"28", navTitle:"③影片摘要", title:"神器 ③：影片摘要",
+    img:"slides/slide-29.jpg", tag:"Studio",
+    body:`<p>把資料變成有畫面的影片重點，<span class="hl">適合分享、教學</span>。</p>`,
+    keypoints:[]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"29", navTitle:"④心智圖", title:"神器 ④：心智圖",
+    img:"slides/slide-30.jpg", tag:"Studio",
+    body:`<p>把雜亂的內容整理成一張結構清楚的心智圖，<strong>一眼看懂全貌</strong>。</p>`,
+    keypoints:[]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"30", navTitle:"⑤報告", title:"神器 ⑤：報告",
+    img:"slides/slide-31.jpg", tag:"Studio",
+    body:`<p>把多份資料交叉整理成一份結構完整的書面報告。</p>`,
+    keypoints:[]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"31", navTitle:"⑥學習卡", title:"神器 ⑥：學習卡",
+    img:"slides/slide-32.jpg", tag:"Studio",
+    body:`<p>自動生成問答式學習卡（Flashcards），<span class="hl">準備考試、複習重點很好用</span>。</p>`,
+    keypoints:[]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"32", navTitle:"⑦測驗", title:"神器 ⑦：測驗",
+    img:"slides/slide-33.jpg", tag:"Studio",
+    body:`<p>根據資料出一份小測驗，<strong>檢查自己到底學會了沒</strong>。</p>`,
+    keypoints:[]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"33", navTitle:"⑧資訊圖表", title:"神器 ⑧：資訊圖表",
+    img:"slides/slide-34.jpg", tag:"Studio",
+    body:`<p>把數據與重點變成好看的資訊圖表，<span class="hl">分享、宣導一看就懂</span>。</p>`,
+    keypoints:[]
+  },
+  {
+    group:"NotebookLM 九種神器", num:"34", navTitle:"⑨資料表", title:"神器 ⑨：資料表",
+    img:"slides/slide-35.jpg", tag:"Studio",
+    body:`<p>把零散資訊整理成結構化表格，<strong>方便比對、彙整</strong>。</p>`,
+    keypoints:["九種不用全示範，挑學員最有感的兩三種"]
   },
 
   /* ============ 收尾 ============ */
   {
-    group:"收尾", num:"14", navTitle:"收尾 + 安全提醒", title:"收尾 ＋ 安全提醒",
-    time:"48–50 分", tag:"純講",
-    body:`<p>50 分鐘前你可能還覺得 AI 離你很遠。現在你會跟它對話、會用它寫公文回民眾、會用手機當口譯、會用它做會議記錄。</p>
-          <p>最後再講一次今天最重要的那句：<span class="hl">AI 給的是草稿，定稿的人是你。</span></p>
-          <p>個資不要丟、法規數字自己核。它是很厲害的實習生，但你永遠是核章的人。</p>
-          <p style="font-weight:800;color:var(--accent-dark);text-align:center;font-size:19px;margin-top:16px;">慢慢來，比較快。🍀</p>`,
-    keypoints:["回顧今天四個能力，給成就感","回扣金句與兩個交通規則作結"]
+    group:"收尾", num:"35", navTitle:"神器使用時機", title:"學習神器使用時機",
+    img:"slides/slide-36.jpg", tag:"整理",
+    body:`<p>一張表收齊：什麼情境用哪一個神器最對味。<span class="hl">帶回家照著挑就好。</span></p>`,
+    keypoints:["當作 NotebookLM 段落總結"]
   },
   {
-    group:"收尾", num:"15", navTitle:"回家練習任務", title:"回家練習任務（挑一個就好）",
-    tag:"帶回家",
-    body:`<ul>
-            <li>🔍 <strong>任務一｜今晚吃什麼</strong>：跟 AI 說冰箱有什麼，請它給晚餐建議</li>
-            <li>✉️ <strong>任務二｜寫一則訊息</strong>：請它幫你寫一則 Line 訊息給家人或同事</li>
-            <li>🔁 <strong>任務三｜越聊越好</strong>：拿到答案後回它「太長了」「再簡單一點」，看它怎麼改</li>
-          </ul>
-          <p>做完一個，你就又進步了一點。<span class="hl">不用怕問錯，AI 最喜歡愛嘗試的人。</span></p>`,
-    keypoints:["強調挑一個就好，降低壓力"]
+    group:"收尾", num:"36", navTitle:"安全四雷區", title:"公部門必備的 AI 安全四雷區",
+    img:"slides/slide-37.jpg", tag:"安全",
+    body:`<p>四個一定要避開的地雷：<strong>拒絕機密外洩、警惕 AI 幻覺、真人負全責、慎用中國工具</strong>。</p>`,
+    keypoints:["公部門場景這頁要慢、要鄭重","回扣開頭的兩個交通規則"]
   },
   {
-    group:"收尾", num:"16", navTitle:"常見問題 FAQ", title:"常見問題與不挫折提醒",
-    tag:"FAQ",
-    body:`<ul>
-            <li><strong>它回答錯了怎麼辦？</strong> 很正常，AI 會出錯。重要的數字、法規自己再查一次。它給草稿，你定稿。</li>
-            <li><strong>它聽不懂我在說什麼？</strong> 把話講更清楚，補上「對象、內容、語氣」，或開新對話重講一次。</li>
-            <li><strong>免費的夠用嗎？</strong> 今天教的這些，免費版完全夠用。</li>
-            <li><strong>我會不會把它弄壞？</strong> 不會。大膽問、大膽試，問錯也不會怎樣。</li>
-          </ul>`,
-    keypoints:["這頁是現場 Q&A 的後備答案"]
-  },
-
-  /* ============ 帶得走 ============ */
-  {
-    group:"帶得走的工具", num:"17", navTitle:"5 隻 Gem 小幫手", title:"帶著走的 Gem 小幫手",
-    tag:"資源",
-    body:`<p>除了今天教的，小D還做了現成的 Gem，點連結自動加到你帳號，<strong>不用記指令</strong>：</p>
-          <ul>
-            <li>📝 <strong>會議記錄員</strong>｜錄音/逐字稿 → 正式會議記錄</li>
-            <li>📋 <strong>公文白話翻譯機</strong>｜生硬公文 → 民眾聽得懂的白話</li>
-            <li>🌐 <strong>櫃台口譯</strong>｜中英雙向即時翻譯</li>
-            <li>📚 <strong>小孩英文家教</strong>｜引導式教學，不直接給答案</li>
-            <li>🥗 <strong>媽媽的營養師</strong>｜拍餐點 → 熱量與飲食建議</li>
-          </ul>`,
-    demo:{label:"Gem 分享連結合集（待補）", url:""},
-    keypoints:["課堂只快速帶過、不示範","引導：回家點講義連結自動加入帳號"]
+    group:"收尾", num:"37", navTitle:"你的大成就", title:"恭喜你達成的大成就",
+    img:"slides/slide-38.jpg", tag:"收尾",
+    body:`<p>盤點今天學會的能力：會跟 AI 對話、會用 Gemini、會用 NotebookLM。<span class="hl">把省下的時間留給更重要的事。</span></p>`,
+    keypoints:["給足成就感，這是學員帶走的信心"]
   },
   {
-    group:"帶得走的工具", num:"18", navTitle:"想學更多", title:"想學更多？這只是開始",
-    tag:"延伸",
-    body:`<p>如果今天讓你覺得「還想學更多」，後面還有 AI 在各行各業的完整應用地圖。慢慢看，不用急。</p>
-          <p style="font-weight:800;color:var(--accent-dark);text-align:center;font-size:19px;margin-top:14px;">今天你按下了 AI 的開機鍵。<br>接下來這條路，慢慢走，會越走越寬。</p>
+    group:"收尾", num:"38", navTitle:"結語", title:"會用 AI 的人，本身就是贏家",
+    img:"slides/slide-39.jpg", tag:"結語",
+    body:`<p style="font-weight:800;color:var(--accent-dark);text-align:center;font-size:19px;margin:6px 0;">把時間留下來。</p>
           <p style="text-align:center;color:var(--text-soft);">🍀 Learn AI with Tarshar｜2026</p>`,
-    demo:{label:"AI 完整應用地圖（待補）", url:""},
-    keypoints:["種下『想知道更多』的火種","導向後續課程／訂閱"]
+    keypoints:["最後再講一次金句：AI 給草稿，你定稿","慢慢來，比較快，作結"]
   },
 
-  /* ============ 講師備忘（自己看） ============ */
+  /* ============ 講師備忘（自己看，無投影片） ============ */
   {
-    group:"講師備忘", num:"19", navTitle:"臨場應變表", title:"臨場應變表",
+    group:"講師備忘", num:"＊1", navTitle:"臨場應變表", title:"臨場應變表",
     tag:"講師用",
     body:`<ul>
-            <li><strong>AI 當天回應慢/不穩</strong> → 改點課前跑好的連結，不要硬等</li>
-            <li><strong>時間超過</strong> → 砍 NotebookLM Studio 細項，四個示範一定保住</li>
-            <li><strong>學員想自己試</strong> → 「這份帶回家自己玩有完整食譜」，現場以看為主</li>
-            <li><strong>有人問非公務玩法</strong> → 「那些回家補充教材裡都有，今天先專心工作用得到的」</li>
-            <li><strong>有人問費用</strong> → 「基本功能免費，夠你日常用」</li>
+            <li><strong>AI 當天回應慢或不穩</strong>：改點課前跑好的連結，不要硬等</li>
+            <li><strong>時間超過</strong>：NotebookLM 九種神器挑兩三種示範就好</li>
+            <li><strong>學員想自己試</strong>：「這份帶回家自己玩有完整食譜」，現場以看為主</li>
+            <li><strong>有人問非公務玩法</strong>：「回家補充教材都有，今天先專心工作用得到的」</li>
+            <li><strong>有人問費用</strong>：「基本功能免費，夠你日常用」</li>
           </ul>`,
     keypoints:[]
   },
   {
-    group:"講師備忘", num:"20", navTitle:"課前檢查清單", title:"課前 30 分鐘檢查清單",
+    group:"講師備忘", num:"＊2", navTitle:"課前檢查清單", title:"課前 30 分鐘檢查清單",
     tag:"講師用",
     body:`<ul>
             <li>☐ 筆電接上螢幕（HDMI 轉接頭），畫面正常</li>
-            <li>☐ Gemini 已登入，四個 Gem 都在、各點開測一次</li>
-            <li>☐ 公文示範、口譯示範、會議記錄示範的連結都能開</li>
+            <li>☐ Gemini 已登入，五招小幫手都在、各點開測一次</li>
+            <li>☐ NotebookLM 已登入，示範用的資料已上傳</li>
             <li>☐ 簡報翻到封面待命</li>
             <li>☐ 跟站長碰面討論宣導圖</li>
           </ul>`,
@@ -460,7 +529,9 @@ const sections = [
     if(s.tool) meta+='<span class="pill tool">'+s.tool+'</span>';
     if(meta) h+='<div class="meta-row">'+meta+'</div>';
     h+='<h3>'+(s.num?'<span class="num">'+s.num+'</span>':'')+s.title+'</h3>';
-    h+='<div class="body">'+s.body+'</div>';
+    // 投影片圖（仿參考頁，放在解說上方）
+    if(s.img) h+='<div class="slide-shot"><img loading="lazy" src="'+s.img+'" alt="'+esc(s.title)+'"></div>';
+    if(s.body) h+='<div class="body">'+s.body+'</div>';
     // 提示詞
     if(s.prompts && s.prompts.length){
       s.prompts.forEach(p=>{
@@ -482,6 +553,18 @@ const sections = [
     sec.innerHTML=h;
     content.appendChild(sec);
   });
+
+  // 點投影片圖放大
+  const lb=document.createElement('div');
+  lb.className='lightbox'; lb.innerHTML='<img alt="">';
+  document.body.appendChild(lb);
+  const lbImg=lb.querySelector('img');
+  content.addEventListener('click',e=>{
+    const im=e.target.closest('.slide-shot img');
+    if(im){ lbImg.src=im.src; lb.classList.add('show'); }
+  });
+  lb.addEventListener('click',()=>lb.classList.remove('show'));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') lb.classList.remove('show'); });
 
   // 複製按鈕
   content.addEventListener('click',e=>{
