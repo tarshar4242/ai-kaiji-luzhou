@@ -92,6 +92,31 @@
     align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
   .lightbox.show{display:flex;}
   .lightbox img{max-width:96vw;max-height:92vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.4);}
+
+  /* 全螢幕播放模式 */
+  .play-btn{position:fixed;top:14px;right:14px;z-index:30;background:var(--accent);color:#fff;
+    border:none;border-radius:10px;padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;
+    font-family:inherit;box-shadow:0 2px 10px rgba(47,58,38,.18);transition:background .15s;}
+  .play-btn:hover{background:var(--accent-dark);}
+  .player{display:none;position:fixed;inset:0;z-index:60;background:#11160c;flex-direction:column;}
+  .player.show{display:flex;}
+  .player-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:2.5vh 2vw;min-height:0;position:relative;}
+  .player-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+  /* 左右點擊熱區 */
+  .player-nav{position:absolute;top:0;bottom:0;width:32%;cursor:pointer;border:none;background:transparent;
+    color:#fff;font-size:34px;opacity:0;transition:opacity .15s;display:flex;align-items:center;}
+  .player-nav:hover{opacity:.55;}
+  .player-nav.prev{left:0;justify-content:flex-start;padding-left:24px;}
+  .player-nav.next{right:0;justify-content:flex-end;padding-right:24px;}
+  .player-bar{flex-shrink:0;display:flex;align-items:center;gap:16px;padding:12px 20px;
+    background:#0c1008;color:#e8efe0;border-top:1px solid #2a331f;}
+  .player-bar .ttl{flex:1;font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .player-bar .count{font-variant-numeric:tabular-nums;color:#9fb487;font-size:14px;}
+  .player-bar button{background:#1c2413;color:#e8efe0;border:1px solid #3a4a26;border-radius:8px;
+    padding:7px 13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .player-bar button:hover{background:#26301a;}
+  .player-bar .exit{background:transparent;border-color:#4a5a33;}
+  @media(max-width:880px){ .play-btn{top:14px;right:12px;padding:8px 12px;font-size:13px;} }
   .fragment .body{font-size:15.5px;}
   .fragment .body p{margin:0 0 13px;}
   .fragment .body ul{margin:0 0 13px;padding-left:22px;}
@@ -143,6 +168,7 @@
 <body>
 
 <button class="menu-toggle" id="menuToggle">☰ 目錄</button>
+<button class="play-btn" id="playBtn">▶ 全螢幕播放</button>
 <div class="overlay" id="overlay"></div>
 
 <div class="layout">
@@ -565,6 +591,64 @@ const sections = [
   });
   lb.addEventListener('click',()=>lb.classList.remove('show'));
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') lb.classList.remove('show'); });
+
+  // ===== 全螢幕播放模式 =====
+  const slides = sections
+    .map((s,i)=>({img:s.img, title:(s.num?s.num+'　':'')+s.title, secId:'sec-'+i}))
+    .filter(s=>s.img);
+  const player=document.createElement('div');
+  player.className='player';
+  player.innerHTML=
+    '<div class="player-stage">'+
+      '<button class="player-nav prev" aria-label="上一張">‹</button>'+
+      '<img alt="">'+
+      '<button class="player-nav next" aria-label="下一張">›</button>'+
+    '</div>'+
+    '<div class="player-bar">'+
+      '<button class="pprev">‹ 上一張</button>'+
+      '<button class="pnext">下一張 ›</button>'+
+      '<span class="ttl"></span>'+
+      '<span class="count"></span>'+
+      '<button class="exit">✕ 離開 (Esc)</button>'+
+    '</div>';
+  document.body.appendChild(player);
+  const pImg=player.querySelector('img');
+  const pTtl=player.querySelector('.ttl');
+  const pCount=player.querySelector('.count');
+  let pIdx=0;
+  function renderPlay(){
+    const s=slides[pIdx];
+    pImg.src=s.img; pImg.alt=s.title;
+    pTtl.textContent=s.title;
+    pCount.textContent=(pIdx+1)+' / '+slides.length;
+  }
+  function openPlayer(start){
+    pIdx=Math.max(0,Math.min(start||0,slides.length-1));
+    renderPlay();
+    player.classList.add('show');
+  }
+  function closePlayer(){ player.classList.remove('show'); }
+  function nextSlide(){ if(pIdx<slides.length-1){pIdx++;renderPlay();} }
+  function prevSlide(){ if(pIdx>0){pIdx--;renderPlay();} }
+
+  // 從目前捲動到的段落開始播放
+  document.getElementById('playBtn').addEventListener('click',()=>{
+    const active=document.querySelector('.nav-item.active');
+    let start=0;
+    if(active){ const id=active.dataset.target; const k=slides.findIndex(s=>s.secId===id); if(k>=0) start=k; }
+    openPlayer(start);
+  });
+  player.querySelector('.exit').addEventListener('click',closePlayer);
+  player.querySelector('.pnext').addEventListener('click',nextSlide);
+  player.querySelector('.pprev').addEventListener('click',prevSlide);
+  player.querySelector('.player-nav.next').addEventListener('click',nextSlide);
+  player.querySelector('.player-nav.prev').addEventListener('click',prevSlide);
+  document.addEventListener('keydown',e=>{
+    if(!player.classList.contains('show')) return;
+    if(e.key==='Escape') closePlayer();
+    else if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();nextSlide();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prevSlide();}
+  });
 
   // 複製按鈕
   content.addEventListener('click',e=>{
