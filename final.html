@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 開機日｜蘆洲監理所 · 授課導覽台</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --sidebar-bg:#f6f8f2;
+    --text:#2f3a26;
+    --text-soft:#6d7a60;
+    --line:#e6ece0;
+    --accent:#5b8a36;        /* 幸運草綠強調色 */
+    --accent-dark:#3d5e26;   /* 深綠標題色 */
+    --accent-soft:#eef5e6;
+    --card-bg:#f6f8f2;
+    --active-bg:#e9f2dd;
+    --prompt-bg:#2f3a26;     /* 提示詞深綠框 */
+    --prompt-text:#f3f6ee;
+    --radius:14px;
+    --maxw:780px;
+    --sidebar-w:300px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"PingFang TC","Heiti TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    line-height:1.78;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .layout{display:flex;min-height:100vh;}
+
+  /* ===== 左側目錄 ===== */
+  .sidebar{
+    width:var(--sidebar-w);
+    background:var(--sidebar-bg);
+    border-right:1px solid var(--line);
+    padding:26px 16px 60px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;
+  }
+  .brand{display:flex;align-items:center;gap:8px;margin:0 8px 2px;}
+  .brand h1{font-size:17px;margin:0;letter-spacing:.5px;color:var(--accent-dark);}
+  .sidebar .subtitle{font-size:12px;color:var(--text-soft);margin:4px 8px 18px;}
+  .search-box{
+    width:100%;border:1px solid var(--line);border-radius:10px;
+    padding:9px 12px;font-size:13.5px;margin-bottom:16px;background:#fff;outline:none;
+  }
+  .search-box:focus{border-color:var(--accent);}
+  .nav-group-title{
+    font-size:11px;font-weight:800;color:var(--accent);letter-spacing:1.5px;
+    margin:18px 8px 6px;
+  }
+  .nav-item{
+    display:flex;align-items:baseline;gap:7px;
+    padding:7px 10px;margin:1px 0;border-radius:9px;color:var(--text);
+    text-decoration:none;font-size:13.7px;cursor:pointer;border:1px solid transparent;
+    transition:background .15s,border-color .15s;
+  }
+  .nav-item:hover{background:#edf1e6;}
+  .nav-item.active{background:var(--active-bg);border-color:#cfe0b8;color:var(--accent-dark);font-weight:700;}
+  .nav-item .num{color:var(--accent);font-variant-numeric:tabular-nums;font-size:12px;opacity:.85;min-width:18px;}
+
+  /* ===== 主內容 ===== */
+  .main{flex:1;padding:0 0 120px;min-width:0;}
+  .content-wrap{max-width:var(--maxw);margin:0 auto;padding:0 36px;}
+  .page-header{padding:54px 0 28px;border-bottom:1px solid var(--line);margin-bottom:10px;}
+  .page-header .eyebrow{color:var(--accent);font-size:13px;font-weight:800;letter-spacing:1px;}
+  .page-header h2{font-size:32px;margin:8px 0 10px;line-height:1.3;color:var(--accent-dark);}
+  .page-header p{color:var(--text-soft);margin:0;font-size:15px;}
+
+  section.fragment{padding:36px 0;border-bottom:1px solid var(--line);scroll-margin-top:20px;}
+  section.fragment:last-child{border-bottom:none;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .pill{font-size:12px;font-weight:700;padding:3px 11px;border-radius:999px;}
+  .pill.time{background:#eef2e8;color:var(--text-soft);}
+  .pill.tag{background:var(--accent-soft);color:var(--accent);}
+  .pill.tool{background:#fff;border:1px solid var(--accent);color:var(--accent);}
+  .fragment h3{font-size:24px;margin:0 0 14px;line-height:1.4;color:var(--accent-dark);}
+  .fragment h3 .num{color:var(--accent);margin-right:10px;font-variant-numeric:tabular-nums;}
+
+  /* 投影片圖（簡報感來源，仿參考頁 16:9 嵌圖） */
+  .slide-shot{position:relative;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;
+    border:1px solid var(--line);margin:0 0 18px;background:#f3f6ee;box-shadow:0 2px 10px rgba(47,58,38,.06);}
+  .slide-shot img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;}
+  /* 點圖放大檢視 */
+  .lightbox{display:none;position:fixed;inset:0;z-index:50;background:rgba(20,26,16,.92);
+    align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+  .lightbox.show{display:flex;}
+  .lightbox img{max-width:96vw;max-height:92vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.4);}
+
+  /* 全螢幕播放模式 */
+  .play-btn{position:fixed;top:14px;right:14px;z-index:30;background:var(--accent);color:#fff;
+    border:none;border-radius:10px;padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;
+    font-family:inherit;box-shadow:0 2px 10px rgba(47,58,38,.18);transition:background .15s;}
+  .play-btn:hover{background:var(--accent-dark);}
+  .player{display:none;position:fixed;inset:0;z-index:60;background:#11160c;flex-direction:column;}
+  .player.show{display:flex;}
+  .player-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:2.5vh 2vw;min-height:0;position:relative;}
+  .player-stage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+  /* 左右點擊熱區 */
+  .player-nav{position:absolute;top:0;bottom:0;width:32%;cursor:pointer;border:none;background:transparent;
+    color:#fff;font-size:34px;opacity:0;transition:opacity .15s;display:flex;align-items:center;}
+  .player-nav:hover{opacity:.55;}
+  .player-nav.prev{left:0;justify-content:flex-start;padding-left:24px;}
+  .player-nav.next{right:0;justify-content:flex-end;padding-right:24px;}
+  .player-bar{flex-shrink:0;display:flex;align-items:center;gap:16px;padding:12px 20px;
+    background:#0c1008;color:#e8efe0;border-top:1px solid #2a331f;}
+  .player-bar .ttl{flex:1;font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .player-bar .count{font-variant-numeric:tabular-nums;color:#9fb487;font-size:14px;}
+  .player-bar button{background:#1c2413;color:#e8efe0;border:1px solid #3a4a26;border-radius:8px;
+    padding:7px 13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .player-bar button:hover{background:#26301a;}
+  .player-bar .exit{background:transparent;border-color:#4a5a33;}
+  @media(max-width:880px){ .play-btn{top:14px;right:12px;padding:8px 12px;font-size:13px;} }
+  .fragment .body{font-size:15.5px;}
+  .fragment .body p{margin:0 0 13px;}
+  .fragment .body ul{margin:0 0 13px;padding-left:22px;}
+  .fragment .body li{margin:5px 0;}
+  .fragment .body strong{color:var(--accent-dark);}
+  .hl{background:#fdf3b8;padding:1px 4px;border-radius:4px;}
+
+  /* 講解重點卡片 */
+  .keycard{background:var(--card-bg);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:var(--radius);padding:16px 20px;margin:18px 0 4px;}
+  .keycard .keycard-title{font-weight:800;font-size:13.5px;margin:0 0 8px;color:var(--accent);}
+  .keycard ul{margin:0;padding-left:20px;}
+  .keycard li{margin:5px 0;font-size:14.5px;}
+
+  /* 提示詞框（深綠，可複製） */
+  .prompt{position:relative;background:var(--prompt-bg);color:var(--prompt-text);
+    border-radius:12px;padding:16px 18px 16px;margin:14px 0;font-size:14.5px;line-height:1.7;}
+  .prompt .plabel{font-size:11.5px;font-weight:700;letter-spacing:.5px;color:#bcd49a;
+    text-transform:uppercase;margin-bottom:7px;padding-right:64px;}
+  .prompt .ptext{white-space:pre-wrap;}
+  .copy-btn{position:absolute;top:12px;right:12px;background:#fff;color:var(--accent-dark);
+    border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;
+    font-family:inherit;transition:background .15s;}
+  .copy-btn:hover{background:#eef5e6;}
+  .copy-btn.done{background:#cfe8b3;}
+
+  /* 示範連結 */
+  .demo{display:inline-flex;align-items:center;gap:7px;margin:4px 0;padding:9px 16px;
+    border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;
+    background:var(--accent);color:#fff;border:none;cursor:pointer;font-family:inherit;}
+  .demo.todo{background:#fff;color:var(--text-soft);border:1px dashed #c2cbb4;cursor:default;}
+
+  /* ===== 行動裝置 ===== */
+  .menu-toggle{display:none;position:fixed;top:14px;left:14px;z-index:30;background:#fff;
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:16px;cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);font-family:inherit;}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:18;}
+  @media(max-width:880px){
+    .menu-toggle{display:block;}
+    .sidebar{position:fixed;z-index:20;left:0;top:0;transform:translateX(-100%);
+      transition:transform .25s;box-shadow:2px 0 16px rgba(0,0,0,.1);}
+    .sidebar.open{transform:translateX(0);}
+    .overlay.show{display:block;}
+    .content-wrap{padding:0 20px;}
+    .page-header{padding-top:64px;}
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰ 目錄</button>
+<button class="play-btn" id="playBtn">▶ 全螢幕播放</button>
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span>🍀</span><h1 id="siteTitle"></h1></div>
+    <p class="subtitle" id="siteSubtitle"></p>
+    <input type="text" class="search-box" id="searchBox" placeholder="搜尋段落…">
+    <nav id="navList"></nav>
+  </aside>
+
+  <main class="main">
+    <div class="content-wrap">
+      <header class="page-header">
+        <div class="eyebrow" id="headerEyebrow"></div>
+        <h2 id="headerTitle"></h2>
+        <p id="headerDesc"></p>
+        <p style="margin-top:14px;font-size:14px;">
+          <a href="講稿_最終版.html" style="color:var(--accent-dark);font-weight:700;text-decoration:none;border-bottom:2px solid var(--accent);">📝 逐張口語講稿</a>
+          <span style="color:var(--line);margin:0 10px;">·</span>
+          <a href="index.html" style="color:var(--text-soft);text-decoration:none;">看舊版（39 張）</a>
+        </p>
+      </header>
+      <div id="contentArea"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* =========================================================
+   內容設定區 —— 要新增/修改內容，只改下面這塊
+   ---------------------------------------------------------
+   每個段落欄位：
+     group     左側目錄分組
+     num       編號 "01"
+     navTitle  目錄短標題
+     title     段落大標
+     img       投影片圖路徑，如 "slides/slide-01.jpg"（可省略；放在解說上方，仿參考頁簡報感）
+     time      時間徽章，如 "12–20 分"（可省略）
+     tag       主題標籤（可省略）
+     tool      用到的工具，如 "Gem 01｜破冰"（可省略）
+     body      講解內容 HTML：<p> <ul><li> <strong> <span class="hl">重點</span>（可省略，圖已說明時可不寫）
+     prompts   可複製提示詞 [{label:"標題", text:"提示詞內容"}]（可省略）
+     demo      示範連結 {label:"按鈕字", url:"網址"}；url 留空會顯示「待補」
+     keypoints 講解重點條列 []（可省略）
+   ========================================================= */
+const site = {
+  title:"AI 開機日｜蘆洲監理所（最終版）",
+  subtitle:"小D教練的授課導覽台 · 47 張完整版 · 慢慢來，比較快",
+  headerEyebrow:"蘆洲監理所專屬 · 零基礎手機入門 · 2026 最終版",
+  headerTitle:"AI 開機日",
+  headerDesc:"只要會滑手機，就學得會。跟著 47 張投影片，一步步按下 AI 的開機鍵。"
+};
+
+const sections = [
+  /* ============ 開場 ============ */
+  {
+    group:"開場", num:"01", navTitle:"封面", title:"【AI 開機日】小D教練的手把手 AI 零基礎手機入門課",
+    img:"slides_v2/slide-01.jpg", tag:"開場",
+    body:`<p>一小時，跟上 AI 那班車。今天不考試、不寫程式，只要會滑手機就能玩。</p>
+          <p style="font-weight:800;color:var(--accent-dark);">「慢慢來，比較快。我們一起來玩！」</p>`,
+    keypoints:["開場先降焦慮：今天是體驗課不是電腦課","金句定調全場節奏：慢慢來，比較快"]
+  },
+  {
+    group:"開場", num:"02", navTitle:"我是小D", title:"我是小D，現在帶 AI 上工",
+    img:"slides_v2/slide-02.jpg", tag:"自我介紹",
+    body:`<p>做過行銷、跑過採購、扛過客服、導過系統，現在帶 AI 上工。</p>
+          <p>「我不是工程師，我跟各位一樣是被工作追著跑的上班族，所以我只教明天就能用的東西。」</p>`,
+    keypoints:["拉近距離：我跟你一樣是上班族，不是工程師","承諾：只教明天就能用的東西"]
+  },
+
+  /* ============ 這是什麼課 ============ */
+  {
+    group:"這是什麼課", num:"03", navTitle:"這是什麼課", title:"這是一堂什麼樣的課？",
+    img:"slides_v2/slide-03.jpg", tag:"觀念",
+    body:`<p><strong>不是傳統電腦課</strong>（學寫程式、要很強的電腦基礎、聽不懂專有名詞、怕做錯跟不上）。</p>
+          <p><strong>而是 AI 開機體驗</strong>：只要會滑手機就能玩、零基礎完全可以、用日常生活的語言、無壓力帶著成就感回家。</p>`,
+    keypoints:["破除『我不會電腦』的恐懼","強調無壓力、帶成就感回家"]
+  },
+  {
+    group:"這是什麼課", num:"04", navTitle:"AI住進生活", title:"其實，AI 早就住進我們的生活裡了",
+    img:"slides_v2/slide-04.jpg", tag:"觀念",
+    body:`<p>從手機拍照修圖、Google 搜尋，到客服系統，背後都有它的影子。</p>
+          <p>但對我們來說，「AI」這兩個字還是好遙遠：聽得多、看得少、不知道從哪裡用？今天就把它變成你會用的工具。</p>`,
+    keypoints:["先讓學員發現：原來我天天在用 AI","點出痛點：不知道從哪裡開始用"]
+  },
+
+  /* ============ AI 是什麼 ============ */
+  {
+    group:"AI 是什麼", num:"05", navTitle:"文字計算機", title:"回信、發公告、寫簽呈… 它只是個「文字計算機」",
+    img:"slides_v2/slide-05.jpg", tag:"比喻",
+    body:`<p>傳統苦幹型 vs 聰明優雅型。很多流暢的公文和信件，都是先請 AI 打草稿，同事自己再微調的。</p>
+          <p>它現在已經像計算機一樣，是桌上必備的日常工具。</p>`,
+    keypoints:["把 AI 講成『文字計算機』，降低神秘感","強調：草稿它打，定稿你來"]
+  },
+  {
+    group:"AI 是什麼", num:"06", navTitle:"會講人話", title:"以前要會寫程式，現在只要會講人話",
+    img:"slides_v2/slide-06.jpg", tag:"對比",
+    body:`<p><strong>傳統電腦</strong>：必須遵守嚴格指令與語法、打錯一個字就當機罷工、需要學寫程式（Coding）。</p>
+          <p><strong>現代 AI</strong>：聽得懂人類日常對話、懂得猜測與適應你的語氣、只要會自然開口說話（Speaking）。</p>`,
+    keypoints:["核心轉折：從 Coding 到 Speaking","讓零基礎學員放心：你會講話就會用"]
+  },
+  {
+    group:"AI 是什麼", num:"07", navTitle:"懂前後文", title:"為什麼它聽得懂人話？因為它懂「前後文」",
+    img:"slides_v2/slide-07.jpg", tag:"比喻",
+    body:`<p>同樣一句「我要買蘋果」：講「肚子好餓喔」它知道是水果攤的蘋果；講「手機螢幕摔壞了」它知道是通訊行的 iPhone。</p>
+          <p>就像人類大腦一樣，AI 能一秒讀懂你的言下之意。</p>`,
+    keypoints:["用蘋果比喻說明『上下文』","帶出：把背景講清楚，它就懂你"]
+  },
+
+  /* ============ 安全須知 ============ */
+  {
+    group:"安全須知", num:"08", navTitle:"停看聽", title:"AI 路上停看聽：不可不知的注意事項",
+    img:"slides_v2/slide-08.jpg", tag:"安全",
+    body:`<p><strong>第一：絕對保護個資隱私。</strong>信用卡號、銀行帳戶、民眾身分證字號、內部機密，絕對不要輸入到對話框。解法：丟給 AI 前先打馬賽克，或用「王先生／XXX」代替。</p>
+          <p><strong>第二：當心 AI 幻覺（Hallucination）。</strong>頂尖模型也可能捏造不存在的法條。解法：涉及重要決策、對外公告時，人工務必最後審核把關。</p>`,
+    keypoints:["公部門最重要一頁：個資與幻覺兩大紅線","反覆強調：法規數字一定人工核"]
+  },
+
+  /* ============ 認識工具 ============ */
+  {
+    group:"認識工具", num:"09", navTitle:"三神寶", title:"你的辦公桌三神寶",
+    img:"slides_v2/slide-09.jpg", tag:"工具",
+    body:`<p><strong>ChatGPT</strong>：萬用助理，整理、改寫、翻譯、出點子都靠它。<br>
+          <strong>NotebookLM</strong>：最乖的整理員，只讀你給的資料、絕不亂編（做會議紀錄首選）。<br>
+          <strong>Gemini</strong>：Google 的好夥伴，用法類似，回家隨時玩。</p>`,
+    keypoints:["三個工具一句話定位，先有印象就好","今天主玩 Gemini 與 NotebookLM"]
+  },
+  {
+    group:"認識工具", num:"10", navTitle:"雙神器PK", title:"該用哪一個？AI 雙神器大 PK",
+    img:"slides_v2/slide-10.jpg", tag:"比較",
+    body:`<p><strong>Gemini／ChatGPT（創意大腦）</strong>：上網查最新資訊、想點子寫貼文、一秒生成插圖都很強；但總結長文件容易有幻覺。</p>
+          <p><strong>NotebookLM（邏輯大腦）</strong>：總結幾十頁文件、交叉比對多個 PDF 是超級強項、會附出處；但無法主動上網、不能產圖。</p>`,
+    keypoints:["一句話分工：創意找 Gemini，讀資料找 NotebookLM","用情境表格幫學員選工具"]
+  },
+  {
+    group:"認識工具", num:"11", navTitle:"省算力習慣", title:"手機操作必學的 4 個省算力小習慣",
+    img:"slides_v2/slide-11.jpg", tag:"心法",
+    body:`<p>❶「長任務」拆成小碎步：先問框架，再逐步深入最省力。<br>
+          ❷ 日常問答切換「簡單模式」：查資料、潤錯字，殺雞不用牛刀。<br>
+          ❸ 上傳檔案前先「瘦身」：先自己做摘要或只貼核心片段，字數越少越省。<br>
+          ❹ 簡單雜事「分流」交辦：基本問題先用其他免費工具擋一下，最強算力留給關鍵企劃。</p>`,
+    keypoints:["帶出『算力』概念：免費額度要省著用","這頁是手機族的省電省力心法"]
+  },
+
+  /* ============ 上手 Gemini ============ */
+  {
+    group:"上手 Gemini", num:"12", navTitle:"第一站登入", title:"第一站：召喚 Gemini／ChatGPT 小助手",
+    img:"slides_v2/slide-12.jpg", tag:"操作", tool:"Gemini / ChatGPT",
+    body:`<p>❶ 拿起手機相機，掃描投影片上的 QR Code。<br>❷ 使用你的 Google 帳號登入。</p>
+          <p><span class="hl">強烈建議用「瀏覽器版」，不要下載 App</span>，瀏覽器版的功能最完整。</p>`,
+    demo:{label:"Gemini 網頁版（gemini.google.com）", url:"https://gemini.google.com"},
+    keypoints:["現場帶大家掃碼、用 Google 登入","一定要講：用瀏覽器版功能才完整"]
+  },
+
+  /* ============ 三個 AI 任務 ============ */
+  {
+    group:"三個 AI 任務", num:"13", navTitle:"三任務總覽", title:"跟著小D 一起執行三個 AI 任務",
+    img:"slides_v2/slide-13.jpg", tag:"總覽",
+    body:`<p>破冰、會議記錄、回覆民眾，三招就讓 AI 上工。不用寫程式、會講話就會用 AI，跟著教練走一遍。</p>`,
+    keypoints:["先給地圖：等下會跑三個公務任務","降低期待壓力：跟著做就好"]
+  },
+  {
+    group:"三個 AI 任務", num:"14", navTitle:"任務一破冰", title:"任務一：破冰之旅（動口不動手）",
+    img:"slides_v2/slide-14.jpg", tag:"示範", tool:"語音輸入",
+    body:`<p>第一次接觸 AI 不用緊張，先讓它自我介紹。用台灣口語，三句話打招呼就夠。</p>
+          <p><span class="hl">不會打字？點麥克風，用講的就好。</span></p>`,
+    keypoints:["示範語音輸入：點麥克風直接講","破冰只要三句話，先消除恐懼"]
+  },
+  {
+    group:"三個 AI 任務", num:"15", navTitle:"破冰示意", title:"破冰之旅 示意（Prompt Card）",
+    img:"slides_v2/slide-15.jpg", tag:"示範", tool:"破冰提示詞",
+    body:`<p>把下面這張「提示詞配方」用講的或貼的給 AI，它就會像新同事一樣跟你打招呼。</p>`,
+    prompts:[
+      {label:"破冰自我介紹（可直接複製）", text:"你是一個親切的 AI 小助手。請用台灣口語跟我自我介紹，格式是三句話（你是誰、可以怎麼用你、邀請我提問），限制在 80 字內、不要列點。背景：我是監理所承辦，第一次接觸 AI。"}
+    ],
+    keypoints:["示範『角色＋任務＋格式＋限制＋背景』五要素的雛形","現場用語音輸入這段，看 AI 回覆"]
+  },
+  {
+    group:"三個 AI 任務", num:"16", navTitle:"任務二會議", title:"任務二：兩小時錄音，兩分鐘做出會議記錄",
+    img:"slides_v2/slide-16.jpg", tag:"示範", tool:"會議記錄",
+    body:`<p>開會不累，會後整理才累。把逐字稿丟給 AI，5 個欄位自動排好；沒提到的它會標【待補】，不會自己編。</p>
+          <p>「你負責開會，AI 負責整理，準時下班不是夢。」</p>`,
+    keypoints:["痛點共鳴：聽打會議記錄最花時間","安全閥：沒講到的標【待補】"]
+  },
+  {
+    group:"三個 AI 任務", num:"17", navTitle:"會議記錄示意", title:"會議記錄 示意（Prompt Card）",
+    img:"slides_v2/slide-17.jpg", tag:"示範", tool:"會議記錄提示詞",
+    body:`<p>把逐字稿貼上，再用下面這張配方，AI 就會整理成可簽呈的正式會議記錄。</p>`,
+    prompts:[
+      {label:"會議記錄整理（可直接複製）", text:"你是一位熟悉政府機關公文格式的會議記錄專員。請把我貼上的逐字稿整理成正式會議記錄，格式包含 5 個欄位：日期、與會人員、討論主題、決議事項、後續分工。限制：用台灣公文口吻；逐字稿沒提到的地方標【待補】，不要自己編。背景：這份要簽呈給主管。"}
+    ],
+    demo:{label:"會議速記王 Gem（點開直接用）", url:"https://gemini.google.com/gem/1bhYyitMTQ1etv-CglmjEPRbDotOlWE26?usp=sharing"},
+    keypoints:["可現場貼一段假逐字稿示範","強調 5 欄位格式與【待補】安全閥"]
+  },
+  {
+    group:"三個 AI 任務", num:"18", navTitle:"任務三回覆", title:"任務三：把民眾抱怨變得體回覆",
+    img:"slides_v2/slide-18.jpg", tag:"示範", tool:"民眾回覆",
+    body:`<p>民眾在臉書抱怨，承辦回得太直容易踩雷。AI 幫你「先安撫、再說明」分兩段寫好。</p>
+          <p>法規數字標【請承辦填寫】，AI 不會亂編。同一件事，講給民眾聽和寫給民眾看，不一樣。</p>`,
+    keypoints:["公關地雷題：直球回覆容易出事","安全閥：法規數字一律留白給承辦"]
+  },
+  {
+    group:"三個 AI 任務", num:"19", navTitle:"回覆示意", title:"民眾回覆 示意（Prompt Card）",
+    img:"slides_v2/slide-19.jpg", tag:"示範", tool:"民眾回覆提示詞",
+    body:`<p>用下面這張配方，AI 會草擬出「同理安撫＋說明處理」兩段式回覆，法規處留白給你填。</p>`,
+    prompts:[
+      {label:"民眾抱怨得體回覆（可直接複製）", text:"你是一位專業且極具耐心的監理所窗口人員。請草擬一段回覆民眾抱怨的文字，格式分兩段（同理安撫＋說明處理），限制 200 字內、不要官腔，法規條號與數字標【請承辦填寫】不要自己編。背景：民眾在臉書留言抱怨補發駕照排隊久、手續繁瑣。"}
+    ],
+    keypoints:["示範『先安撫再說明』的兩段結構","再次強調：法規留白、人工把關"]
+  },
+
+  /* ============ 詠唱心法 ============ */
+  {
+    group:"詠唱心法", num:"20", navTitle:"為何廢話", title:"為什麼 AI 給的答案總是「廢話」？",
+    img:"slides_v2/slide-20.jpg", tag:"心法",
+    body:`<p>指令太模糊，AI 只能猜，產出缺乏結構的華麗廢話；指令超清晰，AI 就能產出精準可用、格式統一的神作。</p>`,
+    prompts:[
+      {label:"❌ NG 詠唱（指令太模糊）", text:"幫我寫 6 篇銷售面膜的廣告文案。"},
+      {label:"✅ PRO 詠唱（指令超清晰）", text:"你是一位行銷顧問。請為上班族女性寫 6 篇活潑風格的面膜 IG 貼文，每篇小於 200 字，並加上點擊連結的行動呼籲（CTA）。"}
+    ],
+    keypoints:["現場對比兩種問法的差別","帶出：你怎麼說，決定它幫多少"]
+  },
+  {
+    group:"詠唱心法", num:"21", navTitle:"黃金詠唱公式", title:"大師級「黃金詠唱公式」",
+    img:"slides_v2/slide-21.jpg", tag:"心法",
+    body:`<p>記住這個萬用模板，你怎麼跟 AI 說話，決定了 AI 能幫你多少。</p>`,
+    keypoints:[
+      "1. 角色 (Role)：賦予身分，例『你是一位有十年經驗的專案經理』",
+      "2. 目標/任務 (Task)：具體要做什麼，例『寫一封感謝信』",
+      "3. 格式 (Format)：輸出樣貌，例『用表格、條列式』",
+      "4. 限制 (Constraints)：邊界，例『300 字內、語氣激勵人心』",
+      "5. 資料範圍/背景 (Context)：來龍去脈，例『我們剛完成系統改版』"
+    ]
+  },
+  {
+    group:"詠唱心法", num:"22", navTitle:"四個秘訣", title:"四個秘訣，一張記住",
+    img:"slides_v2/slide-22.jpg", tag:"心法",
+    body:`<p>① 講清楚（給誰看、講什麼、什麼語氣）<br>
+          ② 不滿意就回它（越聊越好）<br>
+          ③ 卡住開新對話（別硬凹）<br>
+          ④ <span class="hl">重要的自己查（AI 給草稿，你定稿）</span></p>`,
+    keypoints:["這頁當 Gemini 段落的小結","金句收尾：AI 給草稿，你定稿"]
+  },
+
+  /* ============ NotebookLM ============ */
+  {
+    group:"NotebookLM", num:"23", navTitle:"第二站NotebookLM", title:"第二站：NotebookLM 專屬研究員",
+    img:"slides_v2/slide-23.jpg", tag:"操作", tool:"NotebookLM",
+    body:`<p>下午主管突然丟來 100 頁的報告、明天要開會？全部丟給 NotebookLM。</p>
+          <p>它能降伏海量資料（PDF、網站連結、YouTube 交叉比對）、只根據你上傳的資料回答不發明數據、每個回答都附上數字標籤可點開檢查原始文件。</p>`,
+    demo:{label:"NotebookLM 連結（待補）", url:""},
+    keypoints:["定位：它是只讀你資料的研究員","最大賣點：附出處、不亂編"]
+  },
+  {
+    group:"NotebookLM", num:"24", navTitle:"什麼是NotebookLM", title:"什麼是 NotebookLM 工作室？",
+    img:"slides_v2/slide-24.jpg", tag:"觀念",
+    body:`<p>它不是普通的聊天機器人，而是你的專屬知識工作區。</p>
+          <p><strong>一般對話 AI</strong>：單次問答容易忘脈絡、可能幻覺編造、從零開始下指令。<br>
+          <strong>NotebookLM 工作室</strong>：專案式記憶持續累積、絕對基於你上傳的來源回答、帶著背景資料與 AI 協作。</p>`,
+    keypoints:["對比 ChatGPT：一個天馬行空、一個只看你的資料","適合長檔案、會議錄音、跨文件比對"]
+  },
+  {
+    group:"NotebookLM", num:"25", navTitle:"丟資料煉洞察", title:"魔法核心：丟進資料，煉出洞察",
+    img:"slides_v2/slide-25.jpg", tag:"觀念",
+    body:`<p>支援高達 50 個來源、50 萬字吞吐量，一鍵轉化！<br>
+          【輸入】多種格式（PDF、Word、TXT、YouTube、音檔）→【處理】跨來源整合分析 →【輸出】精準回覆、摘要、語音。</p>
+          <p>提示：你的資料就是 AI 的大腦，給得越精準，回答越神。</p>`,
+    keypoints:["用果汁機比喻：丟食材、打成汁","強調：輸入品質決定輸出品質"]
+  },
+  {
+    group:"NotebookLM", num:"26", navTitle:"黃金版位", title:"必懂！NotebookLM 黃金版位",
+    img:"slides_v2/slide-26.jpg", tag:"操作",
+    body:`<p>① <strong>來源區</strong>：按「＋」上傳 PDF、Word、或 YouTube 網址。<br>
+          ② <strong>對話區</strong>：針對上傳的資料，直接問它問題。<br>
+          ③ <strong>Studio（工作室）</strong>：魔法發生地，能秒生心智圖、學習指南。</p>`,
+    keypoints:["帶大家認介面三大區","下一段就是 Studio 的九大神器"]
+  },
+
+  /* ============ NotebookLM 九大神器 ============ */
+  {
+    group:"九大神器", num:"27", navTitle:"神器使用時機", title:"學習神器使用時機（九宮格）",
+    img:"slides_v2/slide-27.jpg", tag:"總覽",
+    body:`<p><strong>快速吸收</strong>：語音摘要（通勤/閉目養神）、影片摘要（長篇 YouTube）、報告（彙整多份文獻）。<br>
+          <strong>主動學習</strong>：心智圖（梳理底層邏輯）、學習卡（記憶專有名詞）、測驗（考前自我檢核）。<br>
+          <strong>輸出分享</strong>：簡報（提案與報告分享）、資訊圖表（社群媒體擴散）、資料表（方案決策與比對）。</p>`,
+    keypoints:["先給全貌：九種輸出分三大用途","時間不夠就挑兩三種示範"]
+  },
+  {
+    group:"九大神器", num:"28", navTitle:"①語音摘要", title:"神器①：語音摘要",
+    img:"slides_v2/slide-28.jpg", tag:"食譜", tool:"語音摘要",
+    body:`<p>讓 AI 把硬核資料變成輕鬆的雙人 Podcast，通勤路上用聽的也能學習。</p>`,
+    prompts:[
+      {label:"語音摘要 Recipe（可直接複製）", text:"角色：你是一位超懂觀眾心理的專業廣播主持人。任務：請根據這份資料，製作一段語音摘要腳本。流程：1. 活潑的開場白 2. 以雙人對談（Host A & B）方式解析三大核心概念 3. 以一句金句總結。限制：語氣幽默生動，像跟朋友聊天，長度適合 5 分鐘通勤聆聽。"}
+    ],
+    keypoints:["主打通勤聽：把資料變 Podcast"]
+  },
+  {
+    group:"九大神器", num:"29", navTitle:"②簡報", title:"神器②：簡報",
+    img:"slides_v2/slide-29.jpg", tag:"食譜", tool:"簡報",
+    body:`<p>一秒生成高質感簡報架構與視覺提案，告別大腦當機。</p>`,
+    prompts:[
+      {label:"簡報 Recipe（可直接複製）", text:"角色：你是一位國際級簡報設計總監。任務：請將這些內容轉化為高質感的簡報大綱與視覺化建議。流程：為每一頁規劃標題、核心重點（限 3 點）、以及配圖建議。限制：視覺風格請設定為「黏土定格動畫風格」，包含色彩豐富的黏土材質，白底黑字原則，每頁不超過 5 行字。"}
+    ],
+    keypoints:["示範把長文一鍵變簡報大綱"]
+  },
+  {
+    group:"九大神器", num:"30", navTitle:"③影片摘要", title:"神器③：影片摘要",
+    img:"slides_v2/slide-30.jpg", tag:"食譜", tool:"影片摘要",
+    body:`<p>沒時間看完一小時的影片？丟入網址，讓 AI 幫你抓出精華時間軸。</p>`,
+    prompts:[
+      {label:"影片摘要 Recipe（可直接複製）", text:"角色：你是一位專屬我的學習教練。任務：請提煉這段影片內容的核心重點與學習價值。流程：1. 寫出 50 字的內容總覽 2. 依照影片發展整理出關鍵概念與案例。限制：使用繁體中文，必須條列式呈現，並把最重要的專有名詞加粗標示。"}
+    ],
+    keypoints:["適合長 YouTube 教學影片"]
+  },
+  {
+    group:"九大神器", num:"31", navTitle:"④心智圖", title:"神器④：心智圖",
+    img:"slides_v2/slide-31.jpg", tag:"食譜", tool:"心智圖",
+    body:`<p>把雜亂無章的思緒，梳理成邏輯清晰的樹狀圖結構。</p>`,
+    prompts:[
+      {label:"心智圖 Recipe（可直接複製）", text:"角色：你是一位擅長結構化思考的邏輯分析師。任務：請將這份文件轉換為有層次的心智圖架構。流程：找出一個「核心主題」，並向外延伸出 3-5 個「主要分支」，每個分支下再列出 2 個「細節子節點」。限制：請使用 Markdown 的縮排清單格式輸出，邏輯必須嚴謹，不偏離原文。"}
+    ],
+    keypoints:["梳理底層邏輯、做讀書筆記"]
+  },
+  {
+    group:"九大神器", num:"32", navTitle:"⑤報告", title:"神器⑤：報告",
+    img:"slides_v2/slide-32.jpg", tag:"食譜", tool:"報告",
+    body:`<p>多來源資料交叉比對，一鍵產出深度洞察的專業報告。</p>`,
+    prompts:[
+      {label:"報告 Recipe（可直接複製）", text:"角色：你是一位嚴謹的產業研究員。任務：綜合我上傳的所有資料，撰寫一份深度洞察報告。流程：包含三個段落：1. 問題背景 2. 核心數據或證據分析 3. 下一步的行動建議。限制：語氣專業正式，絕不腦補未提供的資訊，並在引用的段落標示資料來源。"}
+    ],
+    keypoints:["彙整多份文獻、寫研究報告"]
+  },
+  {
+    group:"九大神器", num:"33", navTitle:"⑥學習卡", title:"神器⑥：學習卡",
+    img:"slides_v2/slide-33.jpg", tag:"食譜", tool:"學習卡",
+    body:`<p>考試救星！把生硬的名詞變成雙面閃卡，隨時隨地測試記憶力。</p>`,
+    prompts:[
+      {label:"學習卡 Recipe（可直接複製）", text:"角色：你是一位超有耐心的備考神隊友。任務：幫我從筆記中製作 10 張雙面學習卡（Flashcards）。流程：掃描全文，挑選出最關鍵的 10 個專有名詞或核心概念。限制：格式請用表格呈現（左欄：卡片正面／專有名詞；右欄：卡片背面／白話文解釋），白話文解釋需用小學生也能懂的比喻。"}
+    ],
+    keypoints:["背專有名詞、考前衝刺"]
+  },
+  {
+    group:"九大神器", num:"34", navTitle:"⑦測驗", title:"神器⑦：測驗",
+    img:"slides_v2/slide-34.jpg", tag:"食譜", tool:"測驗",
+    body:`<p>不知道自己到底學會了沒？讓 AI 老師出題考考你！</p>`,
+    prompts:[
+      {label:"測驗 Recipe（可直接複製）", text:"角色：你是一位嚴格但親切的資深教師。任務：根據這些教材，出一份隨堂測驗來驗證我的理解程度。流程：設計 5 題單選題與 2 題情境應用題，並在測驗的最後附上正確解答與詳細解析。限制：難度中等，請特別針對文件中「最容易混淆的觀念」來設計陷阱題。"}
+    ],
+    keypoints:["自我檢核、出隨堂考"]
+  },
+  {
+    group:"九大神器", num:"35", navTitle:"⑧資訊圖表", title:"神器⑧：資訊圖表",
+    img:"slides_v2/slide-35.jpg", tag:"食譜", tool:"資訊圖表",
+    body:`<p>將長篇大論轉化為社群友善的圖卡腳本，一眼看懂複雜資訊。</p>`,
+    prompts:[
+      {label:"資訊圖表 Recipe（可直接複製）", text:"角色：你是一位熟知社群傳播的資訊圖表設計師。任務：請將這篇長文濃縮成一組 IG 資訊圖表（懶人包）的文字腳本。流程：提煉出 3-5 個最震撼的數據或結論，規劃成「九宮格」或「卡片式」的圖解結構。限制：遵守「圖大於字」原則，文字極度精簡，每一張圖卡的文案不超過 20 個字。"}
+    ],
+    keypoints:["做社群懶人包、宣導圖卡"]
+  },
+  {
+    group:"九大神器", num:"36", navTitle:"⑨資料表", title:"神器⑨：資料表",
+    img:"slides_v2/slide-36.jpg", tag:"食譜", tool:"資料表",
+    body:`<p>選擇困難症的解藥！將散落的資訊整理成一目了然的比較表。</p>`,
+    prompts:[
+      {label:"資料表 Recipe（可直接複製）", text:"角色：你是一位一絲不苟的數據整理達人。任務：請把資料中的多個方案／概念，彙整成一份綜合比較資料表。流程：自行歸納出 4-5 個比較維度（例如：優點、缺點、適用對象、價格等），並將各方案填入對應欄位。限制：必須使用 Markdown 表格語法輸出，內容需客觀中立，如有缺失資料請標示「未提及」。"}
+    ],
+    keypoints:["方案決策、多選項比對"]
+  },
+
+  /* ============ Gemini Gems ============ */
+  {
+    group:"Gemini Gems", num:"37", navTitle:"Gems封面", title:"GEMs 打造你的專屬小幫手",
+    img:"slides_v2/slide-37.jpg", tag:"進階",
+    body:`<p>一次設定，永久套用。免費版就能立刻上手。</p>`,
+    keypoints:["進入今天的壓軸：客製專屬 AI 小幫手"]
+  },
+  {
+    group:"Gemini Gems", num:"38", navTitle:"穿職業裝", title:"幫 AI 穿上專屬職業裝，叫一次做到底",
+    img:"slides_v2/slide-38.jpg", tag:"觀念",
+    body:`<p>Gemini Gems 就像是幫 AI 換上不同的制服。設定一次，它就永遠記得自己的身分與任務（專業助手、客服代表、創意總監）。</p>`,
+    keypoints:["比喻：Gem 就是幫 AI 穿制服","設定一次，之後不用每次重講"]
+  },
+  {
+    group:"Gemini Gems", num:"39", navTitle:"一般vsGems", title:"一般版每天重講，Gems 一次講完",
+    img:"slides_v2/slide-39.jpg", tag:"對比",
+    body:`<p><strong>一般 Gemini（每天換新同事）</strong>：每次都要重打設定、什麼都會但不夠專、只能自己用。</p>
+          <p><strong>Gemini Gems（帶三年的老鳥）</strong>：設定一次永久記住、針對一件事越練越專、可產生連結分享給科室。</p>`,
+    keypoints:["最大好處：可分享連結給整個科室共用","把『換新同事』的痛點講清楚"]
+  },
+  {
+    group:"Gemini Gems", num:"40", navTitle:"三位實習生", title:"為監理所量身打造：你的三位數位實習生",
+    img:"slides_v2/slide-40.jpg", tag:"客製",
+    body:`<p><strong>會議速記王</strong>：專治冗長道安會報與跨課室協調的逐字稿。<br>
+          <strong>民眾留言小幫手</strong>：專治情緒化的粉專客訴與長篇大論。<br>
+          <strong>寫真風格圖卡</strong>：專治死板的宣導海報與社群素材。</p>`,
+    keypoints:["三個 Gem 全為監理所量身打造","等下逐一示範"]
+  },
+  {
+    group:"Gemini Gems", num:"41", navTitle:"實戰①會議速記王", title:"實戰示範①：會議速記王",
+    img:"slides_v2/slide-41.jpg", tag:"示範", tool:"會議速記王 Gem",
+    body:`<p>開完會，將逐字稿丟給它，自動為你整理出決議、待辦事項與負責人。</p>
+          <p><span class="hl">安全閥：逐字稿裡沒講到的資訊，它會標示【待補】，絕不自己亂編，確保簽呈安全。</span></p>`,
+    demo:{label:"會議速記王 Gem（點開直接用）", url:"https://gemini.google.com/gem/1bhYyitMTQ1etv-CglmjEPRbDotOlWE26?usp=sharing"},
+    keypoints:["現場點開 Gem 連結示範","再次強調【待補】安全閥"]
+  },
+  {
+    group:"Gemini Gems", num:"42", navTitle:"實戰②留言小幫手", title:"實戰示範②：民眾留言小幫手",
+    img:"slides_v2/slide-42.jpg", tag:"示範", tool:"民眾留言小幫手 Gem",
+    body:`<p>面對臉書抱怨，它能先安撫情緒，再結構化分段說明處理方式。</p>
+          <p><span class="hl">安全閥：法規條號、辦理天數、應備文件會留白標示【請承辦填寫】，絕對不要讓 AI 自己辦。</span></p>`,
+    demo:{label:"民眾留言小幫手 Gem（待補）", url:""},
+    keypoints:["示範先安撫再說明","法規數字一律留白"]
+  },
+  {
+    group:"Gemini Gems", num:"43", navTitle:"實戰③寫真圖卡", title:"實戰示範③：寫真風格圖卡",
+    img:"slides_v2/slide-43.jpg", tag:"示範", tool:"寫真風格圖卡 Gem",
+    body:`<p>上班幫你做素材，下班陪你做回憶。</p>
+          <p>公務用：活動紀念照、宣導海報配圖、同仁大頭貼。私下玩：韓系寫真、童話繪本風格。</p>`,
+    demo:{label:"寫真風格圖卡 Gem（待補）", url:""},
+    keypoints:["示範一鍵生圖","公務私用兩種情境都示範"]
+  },
+  {
+    group:"Gemini Gems", num:"44", navTitle:"何時開Pro", title:"讓小幫手更聰明：何時該開 Pro 模式？",
+    img:"slides_v2/slide-44.jpg", tag:"心法",
+    body:`<p><strong>一般模式（日常小事）</strong>：潤飾一句話、查個小資料、簡單翻譯。速度快、省算力。</p>
+          <p><strong>Pro 模式（複雜任務）</strong>：分析長篇法規、處理充滿衝突的客訴、多份會議紀錄交叉比對。思考深、不亂編。</p>
+          <p><span class="hl">重要的任務才切換 Pro，小事別殺雞用牛刀。</span></p>`,
+    keypoints:["教學員判斷何時切 Pro","呼應前面的省算力觀念"]
+  },
+  {
+    group:"Gemini Gems", num:"45", navTitle:"領取小幫手", title:"掃碼領取你的三個免費小幫手",
+    img:"slides_v2/slide-45.jpg", tag:"行動",
+    body:`<p>學會說話是第一步，把它存起來，才真的省下你的時間。立刻掃碼，領取你的三個免費小幫手：【1】會議速記王【2】民眾留言小幫手【3】寫真風格圖卡。</p>`,
+    keypoints:["請學員當場掃碼收藏三個 Gem","收藏＝把今天學的存進工具箱"]
+  },
+
+  /* ============ 收尾 ============ */
+  {
+    group:"收尾", num:"46", navTitle:"別變陌生人", title:"別讓今天的新同事，明天變陌生人",
+    img:"slides_v2/slide-46.jpg", tag:"收尾",
+    body:`<p>今天你多了一個新同事。它不嫌你問得多，不笑你打錯字，半夜兩點都還在。感情是慢慢處出來的，AI 也一樣。</p>
+          <p><span class="hl">今日重點：不用全部都會，一天熟一點。處久了，它就是你的好幫手。</span></p>`,
+    keypoints:["收心金句：一天熟一點就好","鼓勵回去每天用它做一件小事"]
+  },
+  {
+    group:"收尾", num:"47", navTitle:"謝謝再見", title:"謝謝蘆洲監理站的夥伴，我們下次見！",
+    img:"slides_v2/slide-47.jpg", tag:"結語",
+    body:`<p style="text-align:center;font-weight:800;color:var(--accent-dark);font-size:18px;">小D｜🍀 Learn AI with Tarshar｜2026</p>`,
+    keypoints:["感謝收尾、留下聯絡方式","把時間留下來，慢慢來比較快"]
+  }
+];
+
+/* ===== 渲染邏輯（一般不用更動） ===== */
+(function(){
+  document.getElementById('siteTitle').textContent = site.title;
+  document.getElementById('siteSubtitle').textContent = site.subtitle;
+  document.getElementById('headerEyebrow').textContent = site.headerEyebrow;
+  document.getElementById('headerTitle').textContent = site.headerTitle;
+  document.getElementById('headerDesc').textContent = site.headerDesc;
+  document.title = site.title;
+
+  const nav = document.getElementById('navList');
+  const content = document.getElementById('contentArea');
+  let lastGroup = null;
+
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  sections.forEach((s,i)=>{
+    const id = "sec-"+i;
+    if(s.group !== lastGroup){
+      const gt = document.createElement('div');
+      gt.className='nav-group-title'; gt.textContent=s.group; nav.appendChild(gt);
+      lastGroup=s.group;
+    }
+    const a=document.createElement('a');
+    a.className='nav-item'; a.href='#'+id; a.dataset.target=id;
+    a.dataset.search=(s.navTitle+' '+s.title+' '+s.body+' '+(s.prompts||[]).map(p=>p.text).join(' ')).toLowerCase();
+    a.innerHTML=(s.num?'<span class="num">'+s.num+'</span>':'')+'<span>'+s.navTitle+'</span>';
+    nav.appendChild(a);
+
+    const sec=document.createElement('section');
+    sec.className='fragment'; sec.id=id;
+    let h='';
+    // 徽章列
+    let meta='';
+    if(s.time) meta+='<span class="pill time">⏱ '+s.time+'</span>';
+    if(s.tag)  meta+='<span class="pill tag">'+s.tag+'</span>';
+    if(s.tool) meta+='<span class="pill tool">'+s.tool+'</span>';
+    if(meta) h+='<div class="meta-row">'+meta+'</div>';
+    h+='<h3>'+(s.num?'<span class="num">'+s.num+'</span>':'')+s.title+'</h3>';
+    // 投影片圖（仿參考頁，放在解說上方）
+    if(s.img) h+='<div class="slide-shot"><img loading="lazy" src="'+s.img+'" alt="'+esc(s.title)+'"></div>';
+    if(s.body) h+='<div class="body">'+s.body+'</div>';
+    // 提示詞
+    if(s.prompts && s.prompts.length){
+      s.prompts.forEach(p=>{
+        h+='<div class="prompt"><button class="copy-btn">複製</button>'+
+           '<div class="plabel">📋 '+esc(p.label)+'</div>'+
+           '<div class="ptext">'+esc(p.text)+'</div></div>';
+      });
+    }
+    // 示範連結
+    if(s.demo){
+      if(s.demo.url) h+='<a class="demo" href="'+s.demo.url+'" target="_blank">▶ '+esc(s.demo.label)+'</a>';
+      else h+='<span class="demo todo">🔗 '+esc(s.demo.label)+'</span>';
+    }
+    // 講解重點
+    if(s.keypoints && s.keypoints.length){
+      h+='<div class="keycard"><div class="keycard-title">🎯 講解重點</div><ul>'+
+         s.keypoints.map(k=>'<li>'+k+'</li>').join('')+'</ul></div>';
+    }
+    sec.innerHTML=h;
+    content.appendChild(sec);
+  });
+
+  // 點投影片圖放大
+  const lb=document.createElement('div');
+  lb.className='lightbox'; lb.innerHTML='<img alt="">';
+  document.body.appendChild(lb);
+  const lbImg=lb.querySelector('img');
+  content.addEventListener('click',e=>{
+    const im=e.target.closest('.slide-shot img');
+    if(im){ lbImg.src=im.src; lb.classList.add('show'); }
+  });
+  lb.addEventListener('click',()=>lb.classList.remove('show'));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') lb.classList.remove('show'); });
+
+  // ===== 全螢幕播放模式 =====
+  const slides = sections
+    .map((s,i)=>({img:s.img, title:(s.num?s.num+'　':'')+s.title, secId:'sec-'+i}))
+    .filter(s=>s.img);
+  const player=document.createElement('div');
+  player.className='player';
+  player.innerHTML=
+    '<div class="player-stage">'+
+      '<button class="player-nav prev" aria-label="上一張">‹</button>'+
+      '<img alt="">'+
+      '<button class="player-nav next" aria-label="下一張">›</button>'+
+    '</div>'+
+    '<div class="player-bar">'+
+      '<button class="pprev">‹ 上一張</button>'+
+      '<button class="pnext">下一張 ›</button>'+
+      '<span class="ttl"></span>'+
+      '<span class="count"></span>'+
+      '<button class="exit">✕ 離開 (Esc)</button>'+
+    '</div>';
+  document.body.appendChild(player);
+  const pImg=player.querySelector('img');
+  const pTtl=player.querySelector('.ttl');
+  const pCount=player.querySelector('.count');
+  let pIdx=0;
+  function renderPlay(){
+    const s=slides[pIdx];
+    pImg.src=s.img; pImg.alt=s.title;
+    pTtl.textContent=s.title;
+    pCount.textContent=(pIdx+1)+' / '+slides.length;
+  }
+  function openPlayer(start){
+    pIdx=Math.max(0,Math.min(start||0,slides.length-1));
+    renderPlay();
+    player.classList.add('show');
+  }
+  function closePlayer(){ player.classList.remove('show'); }
+  function nextSlide(){ if(pIdx<slides.length-1){pIdx++;renderPlay();} }
+  function prevSlide(){ if(pIdx>0){pIdx--;renderPlay();} }
+
+  // 從目前捲動到的段落開始播放
+  document.getElementById('playBtn').addEventListener('click',()=>{
+    const active=document.querySelector('.nav-item.active');
+    let start=0;
+    if(active){ const id=active.dataset.target; const k=slides.findIndex(s=>s.secId===id); if(k>=0) start=k; }
+    openPlayer(start);
+  });
+  player.querySelector('.exit').addEventListener('click',closePlayer);
+  player.querySelector('.pnext').addEventListener('click',nextSlide);
+  player.querySelector('.pprev').addEventListener('click',prevSlide);
+  player.querySelector('.player-nav.next').addEventListener('click',nextSlide);
+  player.querySelector('.player-nav.prev').addEventListener('click',prevSlide);
+  document.addEventListener('keydown',e=>{
+    if(!player.classList.contains('show')) return;
+    if(e.key==='Escape') closePlayer();
+    else if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();nextSlide();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prevSlide();}
+  });
+
+  // 複製按鈕
+  content.addEventListener('click',e=>{
+    const btn=e.target.closest('.copy-btn');
+    if(!btn) return;
+    const text=btn.parentElement.querySelector('.ptext').textContent;
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='已複製 ✓'; btn.classList.add('done');
+      setTimeout(()=>{btn.textContent='複製';btn.classList.remove('done');},1500);
+    });
+  });
+
+  // 捲動高亮
+  const items=[...document.querySelectorAll('.nav-item')];
+  const secEls=[...document.querySelectorAll('section.fragment')];
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(en=>{ if(en.isIntersecting){
+      items.forEach(it=>it.classList.toggle('active',it.dataset.target===en.target.id));
+    }});
+  },{rootMargin:"-20% 0px -70% 0px"});
+  secEls.forEach(el=>obs.observe(el));
+
+  // 搜尋
+  const search=document.getElementById('searchBox');
+  search.addEventListener('input',()=>{
+    const q=search.value.trim().toLowerCase();
+    items.forEach(it=>{it.style.display=(!q||it.dataset.search.includes(q))?'flex':'none';});
+  });
+
+  // 手機目錄
+  const sidebar=document.getElementById('sidebar');
+  const overlay=document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click',()=>{sidebar.classList.add('open');overlay.classList.add('show');});
+  function close(){sidebar.classList.remove('open');overlay.classList.remove('show');}
+  overlay.addEventListener('click',close);
+  nav.addEventListener('click',e=>{if(e.target.closest('.nav-item'))close();});
+})();
+</script>
+</body>
+</html>
