@@ -346,6 +346,7 @@ const sections = [
     prompts:[
       {label:"破冰自我介紹（可直接複製）", text:"你是一個親切的 AI 小助手。請用台灣口語跟我自我介紹，格式是三句話（你是誰、可以怎麼用你、邀請我提問），限制在 80 字內、不要列點。背景：我是監理所承辦，第一次接觸 AI。"}
     ],
+    demo:{label:"破冰示範對話（點開直接看）", url:"https://gemini.google.com/share/89f97dbd48fc"},
     keypoints:["示範『角色＋任務＋格式＋限制＋背景』五要素的雛形","現場用語音輸入這段，看 AI 回覆"]
   },
   {
@@ -362,7 +363,7 @@ const sections = [
     prompts:[
       {label:"會議記錄整理（可直接複製）", text:"你是一位熟悉政府機關公文格式的會議記錄專員。請把我貼上的逐字稿整理成正式會議記錄，格式包含 5 個欄位：日期、與會人員、討論主題、決議事項、後續分工。限制：用台灣公文口吻；逐字稿沒提到的地方標【待補】，不要自己編。背景：這份要簽呈給主管。"}
     ],
-    demo:{label:"會議速記王 Gem（點開直接用）", url:"https://gemini.google.com/gem/1bhYyitMTQ1etv-CglmjEPRbDotOlWE26?usp=sharing"},
+    demo:{label:"會議記錄示範對話（點開直接看）", url:"https://gemini.google.com/share/a58bbb8db7b1"},
     keypoints:["可現場貼一段假逐字稿示範","強調 5 欄位格式與【待補】安全閥"]
   },
   {
@@ -379,6 +380,7 @@ const sections = [
     prompts:[
       {label:"民眾抱怨得體回覆（可直接複製）", text:"你是一位專業且極具耐心的監理所窗口人員。請草擬一段回覆民眾抱怨的文字，格式分兩段（同理安撫＋說明處理），限制 200 字內、不要官腔，法規條號與數字標【請承辦填寫】不要自己編。背景：民眾在臉書留言抱怨補發駕照排隊久、手續繁瑣。"}
     ],
+    demo:{label:"民眾回覆示範對話（點開直接看）", url:"https://gemini.google.com/share/ef648fc40e3a"},
     keypoints:["示範『先安撫再說明』的兩段結構","再次強調：法規留白、人工把關"]
   },
 
@@ -421,7 +423,7 @@ const sections = [
     img:"slides_v2/slide-23.jpg", tag:"操作", tool:"NotebookLM",
     body:`<p>下午主管突然丟來 100 頁的報告、明天要開會？全部丟給 NotebookLM。</p>
           <p>它能降伏海量資料（PDF、網站連結、YouTube 交叉比對）、只根據你上傳的資料回答不發明數據、每個回答都附上數字標籤可點開檢查原始文件。</p>`,
-    demo:{label:"NotebookLM 連結（待補）", url:""},
+    demo:{label:"NotebookLM 示範筆記本（點開直接看）", url:"https://notebooklm.google.com/notebook/338f9996-8754-42a7-8365-0731f7328c62"},
     keypoints:["定位：它是只讀你資料的研究員","最大賣點：附出處、不亂編"]
   },
   {
@@ -456,6 +458,7 @@ const sections = [
     body:`<p><strong>快速吸收</strong>：語音摘要（通勤/閉目養神）、影片摘要（長篇 YouTube）、報告（彙整多份文獻）。<br>
           <strong>主動學習</strong>：心智圖（梳理底層邏輯）、學習卡（記憶專有名詞）、測驗（考前自我檢核）。<br>
           <strong>輸出分享</strong>：簡報（提案與報告分享）、資訊圖表（社群媒體擴散）、資料表（方案決策與比對）。</p>`,
+    demo:{label:"NotebookLM 九大神器示範（點開直接看）", url:"https://notebooklm.google.com/notebook/338f9996-8754-42a7-8365-0731f7328c62"},
     keypoints:["先給全貌：九種輸出分三大用途","時間不夠就挑兩三種示範"]
   },
   {
@@ -573,7 +576,7 @@ const sections = [
     img:"slides_v2/slide-41.jpg", tag:"示範", tool:"會議速記王 Gem",
     body:`<p>開完會，將逐字稿丟給它，自動為你整理出決議、待辦事項與負責人。</p>
           <p><span class="hl">安全閥：逐字稿裡沒講到的資訊，它會標示【待補】，絕不自己亂編，確保簽呈安全。</span></p>`,
-    demo:{label:"會議速記王 Gem（點開直接用）", url:"https://gemini.google.com/gem/1bhYyitMTQ1etv-CglmjEPRbDotOlWE26?usp=sharing"},
+    demo:{label:"會議速記王 Gem（點開直接用）", url:"https://gemini.google.com/gem/1HOQY5Faplkr-tuZfq_Il9DWjnFEreF0z?usp=sharing"},
     keypoints:["現場點開 Gem 連結示範","再次強調【待補】安全閥"]
   },
   {
@@ -581,7 +584,7 @@ const sections = [
     img:"slides_v2/slide-42.jpg", tag:"示範", tool:"民眾留言小幫手 Gem",
     body:`<p>面對臉書抱怨，它能先安撫情緒，再結構化分段說明處理方式。</p>
           <p><span class="hl">安全閥：法規條號、辦理天數、應備文件會留白標示【請承辦填寫】，絕對不要讓 AI 自己辦。</span></p>`,
-    demo:{label:"民眾留言小幫手 Gem（待補）", url:""},
+    demo:{label:"民眾留言小幫手 Gem（點開直接用）", url:"https://gemini.google.com/gem/1ALehTt6S4UP23g1_XegKBlMOMkVTpUmD?usp=sharing"},
     keypoints:["示範先安撫再說明","法規數字一律留白"]
   },
   {
@@ -589,7 +592,7 @@ const sections = [
     img:"slides_v2/slide-43.jpg", tag:"示範", tool:"寫真風格圖卡 Gem",
     body:`<p>上班幫你做素材，下班陪你做回憶。</p>
           <p>公務用：活動紀念照、宣導海報配圖、同仁大頭貼。私下玩：韓系寫真、童話繪本風格。</p>`,
-    demo:{label:"寫真風格圖卡 Gem（待補）", url:""},
+    demo:{label:"寫真風格圖卡 GPT（點開直接用）", url:"https://chatgpt.com/g/g-6a1d51f1ad5c81919705a4b564be058b-xie-zhen-feng-ge-tu-qia-biao-zhun-ban-v2"},
     keypoints:["示範一鍵生圖","公務私用兩種情境都示範"]
   },
   {
