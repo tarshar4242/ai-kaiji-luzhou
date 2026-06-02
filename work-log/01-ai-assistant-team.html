@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一人工作室 ＋ AI 助理團隊 v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#eef0e8; --card:#f8f8f2; --ink:#33392f; --ink2:#5e6357; --line:#d2d4c4;
+  --green:#7d9079; --green-d:#566b51; --green-s:#dde4d5; --clover:#6f8468; --stem:#8c7e58;
+  --you:#a9774f; --you-s:#ecdcc9; --auto:#7d9079; --auto-s:#dde4d5;
+  --ext:#6f8893; --ext-s:#d9e3e6; --warn:#bb7a55; --warn-s:#f0ddca; --tech:#6e6a8a; --tech-s:#e3e1ec;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans TC",sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;padding:42px 22px 80px;position:relative;overflow-x:hidden}
+.bg-clover{position:fixed;right:-60px;top:50px;width:340px;opacity:.05;pointer-events:none;z-index:0}
+.wrap{max-width:1140px;margin:0 auto;position:relative;z-index:1}
+.fade{opacity:0;transform:translateY(14px);animation:rise .7s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+header{display:flex;align-items:center;gap:18px;margin-bottom:12px}
+.logo{width:56px;height:60px;flex:none}
+.kicker{font-size:.78rem;letter-spacing:.3em;color:var(--green-d);font-weight:700;margin-bottom:8px}
+h1{font-family:"Noto Serif TC",serif;font-weight:900;font-size:2.4rem;line-height:1.14}
+.lead{font-size:1.02rem;color:var(--ink2);max-width:800px;margin:14px 0 4px}
+.sec-title{font-family:"Noto Serif TC",serif;font-weight:700;font-size:1.32rem;margin:44px 0 16px;display:flex;gap:12px;align-items:center}
+.sec-title .no{font-size:.85rem;background:var(--green-d);color:#fff;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;font-family:"Noto Sans TC"}
+
+.howto{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--green);border-radius:14px;padding:22px 24px}
+.howto .row{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.tag{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+.tag .d{width:12px;height:12px;border-radius:4px}
+.tag.you .d{background:var(--you)} .tag.auto .d{background:var(--auto)} .tag.t-tech .d{background:var(--tech)}
+.lamps{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.lampkey{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600}
+.lampkey .d{width:12px;height:12px;border-radius:50%}
+.lk-g .d{background:var(--green)} .lk-y .d{background:var(--warn)} .lk-r .d{background:#b65151}
+.howto .rule{margin-top:12px;background:var(--green-s);border-radius:10px;padding:12px 16px;font-size:.92rem}
+.howto .rule b{color:var(--green-d)}
+
+.team{display:flex;flex-wrap:wrap;gap:18px}
+.mate{flex:1 1 500px;min-width:300px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.mate .top{padding:16px 22px;color:#fff;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mate .name{font-family:"Noto Serif TC",serif;font-weight:900;font-size:1.7rem;line-height:1}
+.mate .gua{font-size:.76rem;opacity:.9;margin-left:auto;font-family:"Noto Serif TC"}
+.mate .title{font-size:.82rem;font-weight:700;opacity:.92;width:100%;margin-top:6px;letter-spacing:.05em}
+.mate .body{padding:14px 18px 18px;display:flex;flex-direction:column;gap:12px}
+.m-h .top{background:#7d7a4e} .m-c .top{background:#5f6f64} .m-p .top{background:#9a6b86} .m-i .top{background:#8a7e5a}
+
+.task{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.task-h{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.tname{font-weight:700;font-size:1rem}
+.lamp{margin-left:auto;font-size:.74rem;font-weight:800;padding:3px 11px 3px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+.lamp .d{width:9px;height:9px;border-radius:50%}
+.lamp.green{background:var(--green-s);color:var(--green-d)} .lamp.green .d{background:var(--green)}
+.lamp.amber{background:var(--warn-s);color:var(--warn)} .lamp.amber .d{background:var(--warn)}
+.lamp.you{background:var(--you-s);color:var(--you)} .lamp.you .d{background:var(--you)}
+.roles{display:flex;flex-direction:column;gap:5px}
+.r{font-size:.86rem;padding-left:46px;position:relative}
+.r .lab{position:absolute;left:0;top:1px;font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:5px;width:38px;text-align:center}
+.r.you .lab{background:var(--you-s);color:var(--you)} .r.auto .lab{background:var(--auto-s);color:var(--green-d)}
+.tech{margin-top:9px;border-top:1px dashed var(--line);padding-top:9px;font-size:.82rem;color:var(--ink2);display:flex;flex-direction:column;gap:3px}
+.tech .tl{display:inline-block;font-size:.68rem;font-weight:800;background:var(--tech-s);color:var(--tech);padding:1px 7px;border-radius:5px;margin-right:6px}
+.note-x{margin-top:2px;font-size:.82rem;color:var(--ink2);font-style:italic}
+.cand{margin-top:4px;font-size:.85rem;background:var(--warn-s);border-radius:8px;padding:8px 11px}
+.cand b{color:var(--warn)}
+
+/* flow */
+.flow{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 22px 20px}
+.fstep{display:flex;gap:16px;padding:16px 0;border-bottom:1px dashed var(--line)}
+.fstep:last-child{border-bottom:none}
+.fnum{flex:none;width:34px;height:34px;border-radius:50%;background:var(--green-d);color:#fff;display:grid;place-items:center;font-weight:800;font-family:"Noto Serif TC"}
+.fbody{flex:1}
+.fbody .ft{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fbody .ftn{font-weight:700;font-size:1rem}
+.fbody .meta{font-size:.85rem;color:var(--ink2);margin-top:5px}
+.fbody .meta b{color:var(--ink)}
+
+/* tech table */
+.ttable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:.88rem}
+.ttable th,.ttable td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.ttable th{background:var(--green-d);color:#fff;font-weight:700}
+.ttable tr:last-child td{border-bottom:none}
+.ttable .ty{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--tech-s);color:var(--tech);white-space:nowrap}
+
+.need{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 24px}
+.need ol{margin-left:20px;display:flex;flex-direction:column;gap:8px;font-size:.94rem}
+footer{margin-top:42px;text-align:center;color:var(--ink2);font-size:.82rem;border-top:1px solid var(--line);padding-top:20px}
+@media(max-width:560px){h1{font-size:1.8rem}body{padding:30px 14px 60px}.logo{width:46px}}
+</style>
+</head>
+<body>
+
+<svg class="bg-clover" viewBox="-50 -50 100 110" aria-hidden="true">
+  <g fill="var(--clover)">
+    <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(0)"/>
+    <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(90)"/>
+    <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(180)"/>
+    <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(270)"/>
+  </g>
+  <path d="M0,2 Q 7,22 3,46" stroke="var(--stem)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+</svg>
+
+<div class="wrap">
+  <header class="fade">
+    <svg class="logo" viewBox="-50 -50 100 110" aria-hidden="true">
+      <g fill="var(--clover)">
+        <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(0)"/>
+        <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(90)"/>
+        <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(180)"/>
+        <path d="M0,0 C-3,-14 -20,-13 -20,-28 C-20,-39 -9,-42 0,-32 C9,-42 20,-39 20,-28 C20,-13 3,-14 0,0 Z" transform="rotate(270)"/>
+      </g>
+      <path d="M0,2 Q 7,22 3,46" stroke="var(--stem)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div><div class="kicker">TARSHAR STUDIO ・ 定版規格 v3</div><h1>一人工作室 ＋ AI 助理團隊</h1></div>
+  </header>
+  <p class="lead fade">每條任務都標清楚四件事：你做什麼、秘書自動做什麼、要哪個工具與技術（MCP／API／本機軟體）、誰設定。再用信心燈號告訴你能不能穩穩到 95%。沒有藏起來的盲點。</p>
+
+  <div class="sec-title fade"><span class="no">1</span>怎麼讀這份規格</div>
+  <div class="howto fade">
+    <div class="row">
+      <span class="tag you"><span class="d"></span>你：要你提供、討論或拍板的明確範圍</span>
+      <span class="tag auto"><span class="d"></span>秘書自動：不必你出手</span>
+      <span class="tag t-tech"><span class="d"></span>工具與技術：背後靠什麼，一次性設定</span>
+    </div>
+    <div class="lamps">
+      <span class="lampkey lk-g"><span class="d"></span>綠燈：你與 AI 分工明確，可達 95%</span>
+      <span class="lampkey lk-y"><span class="d"></span>黃燈：受真實條件影響（例如收音）</span>
+      <span class="lampkey lk-r"><span class="d"></span>紅燈：我界定不清或沒把握的真盲點</span>
+    </div>
+    <div class="rule"><b>95% 規則：</b>AI 做不到的缺口，由你補，但你的範圍我寫清楚、而且是你做得到的，合起來達 95%。全份目前沒有紅燈。</div>
+  </div>
+
+  <div class="sec-title fade"><span class="no">2</span>四位助理與任務規格</div>
+  <div class="team fade">
+
+    <!-- 黃裳 -->
+    <div class="mate m-h">
+      <div class="top"><span class="name">黃裳</span><span class="gua">坤卦・黃裳元吉</span><span class="title">首席總管 ・ 行程與死線</span></div>
+      <div class="body">
+        <div class="task">
+          <div class="task-h"><span class="tname">每日晨間行程簡報</span><span class="lamp green"><span class="d"></span>95%可達</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>每兩三天回報實際進度</div><div class="r auto"><span class="lab">自動</span>讀日曆＋進度表，產出今日重點、落後項目、死線倒數，推到手機</div></div>
+          <div class="tech"><div><span class="tl">工具</span>Notion ＋ Google 日曆（connector）</div><div><span class="tl">誰設定</span>你授權一次，之後不碰</div></div>
+        </div>
+        <div class="task">
+          <div class="task-h"><span class="tname">死線與考試倒數</span><span class="lamp green"><span class="d"></span>95%可達</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>提供日期（報告、iPAS 11/14、資安暫列明年 12/31）</div><div class="r auto"><span class="lab">自動</span>倒數、寫進日曆、提前提醒</div></div>
+          <div class="tech"><div><span class="tl">工具</span>Google 日曆（connector）</div><div><span class="tl">誰設定</span>授權一次</div></div>
+        </div>
+        <div class="task">
+          <div class="task-h"><span class="tname">寄信／報名／繳費</span><span class="lamp you"><span class="d"></span>送出你拍板</span></div>
+          <div class="roles"><div class="r auto"><span class="lab">自動</span>擬好草稿、抓好時間提醒</div><div class="r you"><span class="lab">你</span>本人按送出／繳費（資安與信任面向）</div></div>
+          <div class="tech"><div><span class="tl">工具</span>Gmail（connector，只到草稿）</div><div><span class="tl">誰設定</span>授權一次</div></div>
+          <div class="note-x">這是安全設計，不是準確率問題。有後果的動作永遠經過你。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 含章 -->
+    <div class="mate m-c">
+      <div class="top"><span class="name">含章</span><span class="gua">坤卦・含章可貞</span><span class="title">研究助理 ・ 論文與文獻</span></div>
+      <div class="body">
+        <div class="task">
+          <div class="task-h"><span class="tname">文獻自動翻譯</span><span class="lamp green"><span class="d"></span>95%可達</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>把檔案丟進資料夾；提供專有名詞知識庫</div><div class="r auto"><span class="lab">自動</span>逐篇翻譯、產雙語對照、更新進度表</div></div>
+          <div class="tech"><div><span class="tl">工具</span>文件解析（內建技能）＋ Notion</div><div><span class="tl">誰設定</span>無額外設定；名詞庫你提供一次</div></div>
+        </div>
+        <div class="task">
+          <div class="task-h"><span class="tname">教授 meeting 前置包</span><span class="lamp green"><span class="d"></span>95%可達</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>給一句本週想談的方向；最後過目定稿</div><div class="r auto"><span class="lab">自動</span>翻譯、四塊心得、心智圖、講稿草稿</div></div>
+          <div class="tech"><div><span class="tl">工具</span>你的論文技能</div><div><span class="tl">誰設定</span>無額外設定</div></div>
+        </div>
+        <div class="task">
+          <div class="task-h"><span class="tname">論文撰寫本身</span><span class="lamp you"><span class="d"></span>不列入</span></div>
+          <div class="roles"><div class="r auto"><span class="lab">自動</span>只做大綱建議、文獻整理、語句潤飾、進度追蹤</div><div class="r you"><span class="lab">你</span>研究與書寫本人完成，你是作者</div></div>
+          <div class="note-x">原創研究由本人思考提煉。AI僅為副手。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 翩翩 -->
+    <div class="mate m-p">
+      <div class="top"><span class="name">翩翩</span><span class="gua">泰卦・翩翩</span><span class="title">內容助理 ・ 品牌與社群</span></div>
+      <div class="body">
+        <div class="task">
+          <div class="task-h"><span class="tname">FB 貼文／圖卡草稿</span><span class="lamp green"><span class="d"></span>95%可達</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>給主題或心情；定調；按發布鍵</div><div class="r auto"><span class="lab">自動</span>照你的語氣指紋出草稿與圖卡 prompt</div></div>
+          <div class="tech"><div><span class="tl">工具</span>圖像生成（外部 API／現成工具）</div><div><span class="tl">誰設定</span>設定金鑰或綁現成帳號一次</div></div>
+        </div>
+        <div class="task">
+          <div class="task-h"><span class="tname">上課心得轉內容素材</span><span class="lamp green"><span class="d"></span>95%可達</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>提供錄音或筆記</div><div class="r auto"><span class="lab">自動</span>整理成重點、金句、可發文素材</div></div>
+          <div class="tech"><div><span class="tl">工具</span>本機 Whisper（轉錄）</div><div><span class="tl">誰設定</span>同錄音流程，安裝一次</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 大有 -->
+    <div class="mate m-i">
+      <div class="top"><span class="name">大有</span><span class="gua">大有卦・元亨</span><span class="title">投資助理 ・ 交易紀錄整理 ・ 選配</span></div>
+      <div class="body">
+        <div class="task">
+          <div class="task-h"><span class="tname">交易紀錄整理成日誌與月報</span><span class="lamp green"><span class="d"></span>95%可達</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>貼上三家券商對帳單；格式很亂時稍作標註</div><div class="r auto"><span class="lab">自動</span>分帳戶整理、產日誌與績效月報</div></div>
+          <div class="tech"><div><span class="tl">工具</span>投資日誌技能 ＋ 試算表</div><div><span class="tl">誰設定</span>無額外設定</div></div>
+        </div>
+        <div class="task">
+          <div class="task-h"><span class="tname">投資建議／下單</span><span class="lamp you"><span class="d"></span>不列入</span></div>
+          <div class="roles"><div class="r you"><span class="lab">你</span>所有買賣決定 100% 你本人</div></div>
+          <div class="note-x">只整理過去，不替你決定未來，不碰下單。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sec-title fade"><span class="no">3</span>錄音檔流程（定版）</div>
+  <div class="flow fade">
+    <div class="fstep"><div class="fnum">1</div><div class="fbody"><div class="ft"><span class="ftn">丟錄音檔進資料夾</span><span class="lamp green"><span class="d"></span>95%</span></div><div class="meta"><b>你：</b>上傳（或手機自動同步）。<b>工具：</b>指定資料夾。</div></div></div>
+    <div class="fstep"><div class="fnum">2</div><div class="fbody"><div class="ft"><span class="ftn">轉逐字稿</span><span class="lamp green"><span class="d"></span>95%可達</span></div><div class="meta"><b>自動：</b>本機 Whisper 轉錄。<b>你：</b>顧好收音品質、提供名詞知識庫。<b>工具：</b>本機 Whisper（本機軟體，我幫你裝一次，醫療錄音不上雲）。最終準確率隨你的收音與名詞表而定，這塊歸你顧，所以列綠燈。</div></div></div>
+    <div class="fstep"><div class="fnum">3</div><div class="fbody"><div class="ft"><span class="ftn">判別類型（醫療／專案／課堂）</span><span class="lamp green"><span class="d"></span>95%可達</span></div><div class="meta"><b>自動：</b>判讀內容。<b>你：</b>子資料夾分類或一鍵確認（你選一種）。</div></div></div>
+    <div class="fstep"><div class="fnum">4</div><div class="fbody"><div class="ft"><span class="ftn">套對應模板生會議記錄</span><span class="lamp green"><span class="d"></span>95%</span></div><div class="meta"><b>自動：</b>依類型生成。<b>工具：</b>Cowork ＋ 技能。</div></div></div>
+    <div class="fstep"><div class="fnum">5</div><div class="fbody"><div class="ft"><span class="ftn">歸檔、建索引、回報</span><span class="lamp green"><span class="d"></span>98%</span></div><div class="meta"><b>自動：</b>存檔＋更新索引＋進晨間簡報。<b>工具：</b>Notion（connector）。</div></div></div>
+  </div>
+
+  <div class="sec-title fade"><span class="no">4</span>技術需求總表（誰處理，一次看完）</div>
+  <table class="ttable fade">
+    <tr><th>工具／技術</th><th>類型</th><th>用在哪</th><th>誰設定（一次性）</th><th>費用</th></tr>
+    <tr><td>本機 Whisper</td><td><span class="ty">本機軟體</span></td><td>所有語音轉文字</td><td>裝在 Mac mini，我給手把手清單</td><td>免費</td></tr>
+    <tr><td>Notion</td><td><span class="ty">Connector</span></td><td>進度表、歸檔、索引</td><td>你授權一次</td><td>你現有方案</td></tr>
+    <tr><td>Google 日曆</td><td><span class="ty">Connector</span></td><td>死線與考試提醒</td><td>你授權一次</td><td>免費</td></tr>
+    <tr><td>Gmail</td><td><span class="ty">Connector</span></td><td>草擬信件（不自動寄）</td><td>你授權一次</td><td>免費</td></tr>
+    <tr><td>圖像生成</td><td><span class="ty">外部 API</span></td><td>圖卡產圖</td><td>設金鑰或綁現成工具</td><td>視用量</td></tr>
+    <tr><td>文件解析（PDF）</td><td><span class="ty">內建技能</span></td><td>文獻翻譯</td><td>無需設定</td><td>免費</td></tr>
+    <tr><td>Cowork 排程</td><td><span class="ty">內建</span></td><td>所有定時任務的觸發</td><td>App 內設定一次</td><td>訂閱內</td></tr>
+  </table>
+
+  <div class="sec-title fade"><span class="no">5</span>計劃階段，還差這幾筆（之後補）</div>
+  <div class="need fade">
+    <ol>
+      <li>各資料夾實際路徑（現用虛擬，你之後給我直接套）。</li>
+      <li>資安考試確定日期（暫列明年 12/31）。</li>
+      <li>錄音分類你選：子資料夾，或一鍵確認。</li>
+    </ol>
+  </div>
+
+  <footer>產給 Tarshar ・ 一人工作室 AI 助理團隊 v3 定版 ・ 黃裳 含章 翩翩 大有 四位定名</footer>
+</div>
+<script>document.querySelectorAll('.fade').forEach((el,i)=>{el.style.animationDelay=(i*0.06)+'s';});</script>
+</body>
+</html>
