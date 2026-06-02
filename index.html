@@ -3,37 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🍀 Tarshar 2026 工作坊</title>
+<title>🖥 蘆洲監理所・AI 開機日</title>
 <style>
   :root{
     --accent:#5b8a36; --accent-dark:#3d5e26; --ink:#2c2c2c;
     --muted:#6b7280; --line:#e6e6e0; --paper:#fbfaf5;
-    --hl:#fdf3b8; --radius:16px; --maxw:980px;
+    --radius:16px; --maxw:980px;
   }
   *{box-sizing:border-box}
   body{margin:0;background:#f3f2ec;color:var(--ink);
     font-family:"PingFang TC","Noto Sans TC","Helvetica Neue",Arial,sans-serif;
     line-height:1.8;font-size:16.5px;}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:46px 22px 90px;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:30px 22px 90px;}
+  .backbar{margin-bottom:16px;}
+  .backbar a{font-size:13.5px;color:var(--accent-dark);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:4px 14px;
+    transition:background .12s,border-color .12s;}
+  .backbar a:hover{background:#eef4e6;border-color:var(--accent);}
   header.hero{background:linear-gradient(135deg,#5b8a36,#3d5e26);color:#fff;
     border-radius:var(--radius);padding:42px 34px;margin-bottom:30px;
     box-shadow:0 10px 30px rgba(61,94,38,.18);}
   header.hero .eyebrow{font-size:13px;letter-spacing:.1em;opacity:.9;}
-  header.hero h1{margin:8px 0 10px;font-size:34px;letter-spacing:.02em;}
+  header.hero h1{margin:8px 0 10px;font-size:32px;letter-spacing:.02em;}
   header.hero p{margin:0;opacity:.95;font-size:15.5px;max-width:640px;}
   .section-label{margin:36px 0 14px;color:var(--accent-dark);font-size:14px;
     font-weight:800;letter-spacing:.08em;border-left:5px solid var(--accent);
     padding-left:11px;}
-  .project{background:#fff;border:1px solid var(--line);border-radius:var(--radius);
-    padding:26px 28px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.03);}
-  .project .ptop{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px;}
-  .project h2{margin:0;font-size:22px;color:var(--ink);}
-  .project .badge{font-size:12px;color:#fff;background:var(--accent);
-    border-radius:20px;padding:3px 12px;font-weight:700;flex:none;}
-  .project .pdesc{margin:6px 0 18px;color:var(--muted);font-size:14.5px;}
   .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   .card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);
-    border-radius:12px;padding:18px 20px;background:var(--paper);
+    border-radius:12px;padding:20px 22px;background:#fff;
     transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;}
   .card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(61,94,38,.14);
     border-color:var(--accent);}
@@ -44,74 +42,47 @@
     display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
   .subrow a{color:var(--accent-dark);text-decoration:none;border-bottom:1px dashed var(--accent);}
   .subrow .dot{color:var(--line);}
-  .soon{border:1.5px dashed #c9c9bf;background:transparent;color:var(--muted);
-    text-align:center;padding:26px;border-radius:var(--radius);font-size:14.5px;}
   footer{margin-top:40px;text-align:center;color:var(--muted);font-size:13px;}
-  @media (max-width:680px){ .cards{grid-template-columns:1fr;} header.hero h1{font-size:27px;} }
+  @media (max-width:680px){ .cards{grid-template-columns:1fr;} header.hero h1{font-size:25px;} }
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <div class="backbar"><a href="https://tarshar4242.github.io/tarshar-2026/">← 回工作坊總站</a></div>
+
   <header class="hero">
-    <div class="eyebrow">🍀 Tarshar・AI 教學工作坊</div>
-    <h1>Tarshar 2026 工作坊</h1>
-    <p>把每一場課程的教材，整理成可以馬上上手、現場示範、課後練習的線上教案。下面是各專案的入口，陸續增加中。</p>
+    <div class="eyebrow">🍀 Tarshar・公部門零基礎 AI</div>
+    <h1>蘆洲監理所・AI 開機日</h1>
+    <p>47 張投影片的完整教案。互動簡報可現場點開示範連結；素材庫提供每頁可講的真實例子讓你練習。</p>
   </header>
 
-  <div class="section-label">專案列表</div>
+  <div class="section-label">課程教材</div>
+  <div class="cards">
+    <a class="card" href="final.html">
+      <div class="ico">🖥</div>
+      <div class="ct">互動教學簡報</div>
+      <div class="cs">47 張投影片 · 樹狀目錄 · 全螢幕 · 9 個現場示範連結</div>
+    </a>
+    <a class="card" href="上台舉例素材庫_最終版.html">
+      <div class="ico">💡</div>
+      <div class="ct">舉例素材庫</div>
+      <div class="cs">每頁一個真實例子 · 以前 vs 現在對比 · 練習用</div>
+    </a>
+  </div>
 
-  <!-- ===== 專案 1：蘆洲監理所 ===== -->
-  <section class="project">
-    <div class="ptop">
-      <h2>蘆洲監理所 · AI 開機日</h2>
-      <span class="badge">公部門零基礎 AI</span>
-    </div>
-    <p class="pdesc">47 張投影片的完整教案。互動簡報可現場點開示範連結；素材庫提供每頁可講的真實例子讓你練習。</p>
-    <div class="cards">
-      <a class="card" href="final.html">
-        <div class="ico">🖥</div>
-        <div class="ct">互動教學簡報</div>
-        <div class="cs">47 張投影片 · 樹狀目錄 · 全螢幕 · 9 個現場示範連結</div>
-      </a>
-      <a class="card" href="上台舉例素材庫_最終版.html">
-        <div class="ico">💡</div>
-        <div class="ct">舉例素材庫</div>
-        <div class="cs">每頁一個真實例子 · 以前 vs 現在對比 · 練習用</div>
-      </a>
-    </div>
-    <div class="subrow">
-      <span>給學員：</span>
-      <a href="教學版.html">🎓 學員教學版（乾淨版，可直接分享）</a>
-    </div>
-    <div class="subrow">
-      <span>其他：</span>
-      <a href="講稿_最終版.html">📝 講稿</a>
-      <span class="dot">·</span>
-      <a href="舊版39張簡報.html">看舊版（39 張）</a>
-    </div>
-  </section>
+  <div class="subrow">
+    <span>給學員：</span>
+    <a href="教學版.html">🎓 學員教學版（乾淨版，可直接分享）</a>
+  </div>
+  <div class="subrow">
+    <span>其他：</span>
+    <a href="講稿_最終版.html">📝 講稿</a>
+    <span class="dot">·</span>
+    <a href="舊版39張簡報.html">看舊版（39 張）</a>
+  </div>
 
-  <!-- ===== 專案 2：工作事件簿 ===== -->
-  <section class="project">
-    <div class="ptop">
-      <h2>📒 工作事件簿</h2>
-      <span class="badge">持續累積</span>
-    </div>
-    <p class="pdesc">把每一個做過的專案做成一則紀錄，左側目錄可點選切換。目前第一項已上線，後續陸續加入。</p>
-    <div class="cards">
-      <a class="card" href="work-log/index.html">
-        <div class="ico">📒</div>
-        <div class="ct">打開工作事件簿</div>
-        <div class="cs">左側目錄 · 01 一人工作室・AI 助理團隊 · 陸續增加</div>
-      </a>
-    </div>
-  </section>
-
-  <!-- ===== 未來專案占位 ===== -->
-  <div class="soon">更多專案陸續加入中 ⋯</div>
-
-  <footer>🍀 by Tarshar・2026 工作坊總覽</footer>
+  <footer>🍀 by Tarshar・蘆洲監理所 AI 開機日</footer>
 
 </div>
 </body>
