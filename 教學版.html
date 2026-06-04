@@ -116,14 +116,21 @@
     padding:7px 13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
   .player-bar button:hover{background:#26301a;}
   .player-bar .exit{background:transparent;border-color:#4a5a33;}
-  /* 全螢幕內的示範連結按鈕 */
-  .player-bar a.demo-live{display:none;align-items:center;gap:6px;background:#ffd24a;color:#3a2e00;
-    border:none;border-radius:8px;padding:8px 15px;font-size:14.5px;font-weight:800;cursor:pointer;
-    text-decoration:none;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;
-    box-shadow:0 2px 10px rgba(0,0,0,.25);}
-  .player-bar a.demo-live:hover{background:#ffc21f;}
+  /* 全螢幕：當頁的連結與提示詞按鈕列 */
+  .player-actions{flex-shrink:0;display:none;gap:10px;justify-content:center;flex-wrap:wrap;
+    align-items:center;padding:10px 16px;background:#0c1008;border-top:1px solid #2a331f;}
+  .player-actions.show{display:flex;}
+  .player-actions .pa-link,.player-actions .pa-copy{display:inline-flex;align-items:center;gap:6px;
+    border:none;border-radius:9px;padding:9px 16px;font-size:14.5px;font-weight:800;cursor:pointer;
+    font-family:inherit;text-decoration:none;max-width:42vw;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.25);}
+  .player-actions .pa-link{background:#ffd24a;color:#3a2e00;}
+  .player-actions .pa-link:hover{background:#ffc21f;}
+  .player-actions .pa-copy{background:#eaf3df;color:#2f3a26;}
+  .player-actions .pa-copy:hover{background:#dfeed0;}
+  .player-actions .pa-copy.done{background:#cfe8b3;}
   @media(max-width:880px){ .play-btn{top:14px;right:12px;padding:8px 12px;font-size:13px;}
-    .player-bar a.demo-live{max-width:40vw;font-size:13px;padding:7px 11px;} }
+    .player-actions .pa-link,.player-actions .pa-copy{max-width:80vw;font-size:13px;padding:8px 12px;} }
   .fragment .body{font-size:15.5px;}
   .fragment .body p{margin:0 0 13px;}
   .fragment .body ul{margin:0 0 13px;padding-left:22px;}
@@ -597,30 +604,27 @@ const sections = [
     keypoints:["示範一鍵生圖","公務私用兩種情境都示範"]
   },
   {
-    group:"Gemini Gems", num:"44", navTitle:"何時開Pro", title:"讓小幫手更聰明：何時該開 Pro 模式？",
-    img:"slides_v2/slide-44.jpg", tag:"心法",
-    body:`<p><strong>一般模式（日常小事）</strong>：潤飾一句話、查個小資料、簡單翻譯。速度快、省算力。</p>
-          <p><strong>Pro 模式（複雜任務）</strong>：分析長篇法規、處理充滿衝突的客訴、多份會議紀錄交叉比對。思考深、不亂編。</p>
-          <p><span class="hl">重要的任務才切換 Pro，小事別殺雞用牛刀。</span></p>`,
-    keypoints:["教學員判斷何時切 Pro","呼應前面的省算力觀念"]
-  },
-  {
-    group:"Gemini Gems", num:"45", navTitle:"領取小幫手", title:"掃碼領取你的三個免費小幫手",
+    group:"Gemini Gems", num:"44", navTitle:"領取小幫手", title:"掃碼領取你的三個免費小幫手",
     img:"slides_v2/slide-45.jpg", tag:"行動",
     body:`<p>學會說話是第一步，把它存起來，才真的省下你的時間。立刻掃碼，領取你的三個免費小幫手：【1】會議速記王【2】民眾留言小幫手【3】寫真風格圖卡。</p>`,
+    demos:[
+      {label:"會議速記王 Gem", url:"https://gemini.google.com/gem/1HOQY5Faplkr-tuZfq_Il9DWjnFEreF0z?usp=sharing"},
+      {label:"民眾留言小幫手 Gem", url:"https://gemini.google.com/gem/1ALehTt6S4UP23g1_XegKBlMOMkVTpUmD?usp=sharing"},
+      {label:"寫真風格圖卡 GPT", url:"https://chatgpt.com/g/g-6a1d51f1ad5c81919705a4b564be058b"}
+    ],
     keypoints:["請學員當場掃碼收藏三個 Gem","收藏＝把今天學的存進工具箱"]
   },
 
   /* ============ 收尾 ============ */
   {
-    group:"收尾", num:"46", navTitle:"別變陌生人", title:"別讓今天的新同事，明天變陌生人",
+    group:"收尾", num:"45", navTitle:"別變陌生人", title:"別讓今天的新同事，明天變陌生人",
     img:"slides_v2/slide-46.jpg", tag:"收尾",
     body:`<p>今天你多了一個新同事。它不嫌你問得多，不笑你打錯字，半夜兩點都還在。感情是慢慢處出來的，AI 也一樣。</p>
           <p><span class="hl">今日重點：不用全部都會，一天熟一點。處久了，它就是你的好幫手。</span></p>`,
     keypoints:["收心金句：一天熟一點就好","鼓勵回去每天用它做一件小事"]
   },
   {
-    group:"收尾", num:"47", navTitle:"謝謝再見", title:"謝謝蘆洲監理站的夥伴，我們下次見！",
+    group:"收尾", num:"46", navTitle:"謝謝再見", title:"謝謝蘆洲監理站的夥伴，我們下次見！",
     img:"slides_v2/slide-47.jpg", tag:"結語",
     body:`<p style="text-align:center;font-weight:800;color:var(--accent-dark);font-size:18px;">小D｜🍀 Learn AI with Tarshar｜2026</p>`,
     keypoints:["感謝收尾、留下聯絡方式","把時間留下來，慢慢來比較快"]
@@ -681,6 +685,9 @@ const sections = [
       if(s.demo.url) h+='<a class="demo" href="'+s.demo.url+'" target="_blank">▶ '+esc(s.demo.label)+'</a>';
       else h+='<span class="demo todo">🔗 '+esc(s.demo.label)+'</span>';
     }
+    if(s.demos && s.demos.length){
+      s.demos.forEach(dm=>{ h+='<a class="demo" href="'+dm.url+'" target="_blank">▶ '+esc(dm.label)+'</a> '; });
+    }
     // 講解重點
     if(s.keypoints && s.keypoints.length){
       h+='<div class="keycard"><div class="keycard-title">🎯 講解重點</div><ul>'+
@@ -704,7 +711,7 @@ const sections = [
 
   // ===== 全螢幕播放模式 =====
   const slides = sections
-    .map((s,i)=>({img:s.img, title:(s.num?s.num+'　':'')+s.title, secId:'sec-'+i, demo:s.demo}))
+    .map((s,i)=>({img:s.img, title:(s.num?s.num+'　':'')+s.title, secId:'sec-'+i, demo:s.demo, demos:s.demos, prompts:s.prompts}))
     .filter(s=>s.img);
   const player=document.createElement('div');
   player.className='player';
@@ -714,11 +721,11 @@ const sections = [
       '<img alt="">'+
       '<button class="player-nav next" aria-label="下一張">›</button>'+
     '</div>'+
+    '<div class="player-actions"></div>'+
     '<div class="player-bar">'+
       '<button class="pprev">‹ 上一張</button>'+
       '<button class="pnext">下一張 ›</button>'+
       '<span class="ttl"></span>'+
-      '<a class="demo-live" target="_blank" rel="noopener"></a>'+
       '<span class="count"></span>'+
       '<button class="exit">✕ 離開 (Esc)</button>'+
     '</div>';
@@ -726,20 +733,32 @@ const sections = [
   const pImg=player.querySelector('img');
   const pTtl=player.querySelector('.ttl');
   const pCount=player.querySelector('.count');
-  const pDemo=player.querySelector('.demo-live');
+  const pActions=player.querySelector('.player-actions');
   let pIdx=0;
   function renderPlay(){
     const s=slides[pIdx];
     pImg.src=s.img; pImg.alt=s.title;
     pTtl.textContent=s.title;
     pCount.textContent=(pIdx+1)+' / '+slides.length;
-    if(s.demo && s.demo.url){
-      pDemo.href=s.demo.url;
-      pDemo.textContent='▶ '+s.demo.label;
-      pDemo.style.display='inline-flex';
-    } else {
-      pDemo.style.display='none';
-    }
+    // 當頁的連結 + 提示詞，做成可按的按鈕
+    const links=[];
+    if(s.demo && s.demo.url) links.push(s.demo);
+    if(s.demos) s.demos.forEach(d=>{ if(d&&d.url) links.push(d); });
+    const prompts=s.prompts||[];
+    let html='';
+    links.forEach(l=>{ html+='<a class="pa-link" target="_blank" rel="noopener" href="'+l.url+'">▶ '+esc(l.label)+'</a>'; });
+    prompts.forEach((p,i)=>{ html+='<button class="pa-copy" data-pi="'+i+'">📋 複製：'+esc(p.label)+'</button>'; });
+    pActions.innerHTML=html;
+    pActions.classList.toggle('show', links.length>0 || prompts.length>0);
+    pActions.querySelectorAll('.pa-copy').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const p=prompts[+btn.dataset.pi];
+        navigator.clipboard.writeText(p.text).then(()=>{
+          const o=btn.innerHTML; btn.textContent='已複製 ✓'; btn.classList.add('done');
+          setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('done');},1500);
+        });
+      });
+    });
   }
   function openPlayer(start){
     pIdx=Math.max(0,Math.min(start||0,slides.length-1));
