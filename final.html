@@ -116,7 +116,14 @@
     padding:7px 13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
   .player-bar button:hover{background:#26301a;}
   .player-bar .exit{background:transparent;border-color:#4a5a33;}
-  @media(max-width:880px){ .play-btn{top:14px;right:12px;padding:8px 12px;font-size:13px;} }
+  /* 全螢幕內的示範連結按鈕 */
+  .player-bar a.demo-live{display:none;align-items:center;gap:6px;background:#ffd24a;color:#3a2e00;
+    border:none;border-radius:8px;padding:8px 15px;font-size:14.5px;font-weight:800;cursor:pointer;
+    text-decoration:none;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;
+    box-shadow:0 2px 10px rgba(0,0,0,.25);}
+  .player-bar a.demo-live:hover{background:#ffc21f;}
+  @media(max-width:880px){ .play-btn{top:14px;right:12px;padding:8px 12px;font-size:13px;}
+    .player-bar a.demo-live{max-width:40vw;font-size:13px;padding:7px 11px;} }
   .fragment .body{font-size:15.5px;}
   .fragment .body p{margin:0 0 13px;}
   .fragment .body ul{margin:0 0 13px;padding-left:22px;}
@@ -706,7 +713,7 @@ const sections = [
 
   // ===== 全螢幕播放模式 =====
   const slides = sections
-    .map((s,i)=>({img:s.img, title:(s.num?s.num+'　':'')+s.title, secId:'sec-'+i}))
+    .map((s,i)=>({img:s.img, title:(s.num?s.num+'　':'')+s.title, secId:'sec-'+i, demo:s.demo}))
     .filter(s=>s.img);
   const player=document.createElement('div');
   player.className='player';
@@ -720,6 +727,7 @@ const sections = [
       '<button class="pprev">‹ 上一張</button>'+
       '<button class="pnext">下一張 ›</button>'+
       '<span class="ttl"></span>'+
+      '<a class="demo-live" target="_blank" rel="noopener"></a>'+
       '<span class="count"></span>'+
       '<button class="exit">✕ 離開 (Esc)</button>'+
     '</div>';
@@ -727,12 +735,20 @@ const sections = [
   const pImg=player.querySelector('img');
   const pTtl=player.querySelector('.ttl');
   const pCount=player.querySelector('.count');
+  const pDemo=player.querySelector('.demo-live');
   let pIdx=0;
   function renderPlay(){
     const s=slides[pIdx];
     pImg.src=s.img; pImg.alt=s.title;
     pTtl.textContent=s.title;
     pCount.textContent=(pIdx+1)+' / '+slides.length;
+    if(s.demo && s.demo.url){
+      pDemo.href=s.demo.url;
+      pDemo.textContent='▶ '+s.demo.label;
+      pDemo.style.display='inline-flex';
+    } else {
+      pDemo.style.display='none';
+    }
   }
   function openPlayer(start){
     pIdx=Math.max(0,Math.min(start||0,slides.length-1));
