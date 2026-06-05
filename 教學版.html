@@ -718,6 +718,7 @@ const sections = [
       '<button class="pnext">下一張 ›</button>'+
       '<span class="ttl"></span>'+
       '<span class="count"></span>'+
+      '<button class="home">🏠 回首頁</button>'+
       '<button class="exit">✕ 離開 (Esc)</button>'+
     '</div>';
   document.body.appendChild(player);
@@ -768,6 +769,7 @@ const sections = [
     openPlayer(start);
   });
   player.querySelector('.exit').addEventListener('click',closePlayer);
+  player.querySelector('.home').addEventListener('click',()=>{ pIdx=0; renderPlay(); });
   player.querySelector('.pnext').addEventListener('click',nextSlide);
   player.querySelector('.pprev').addEventListener('click',prevSlide);
   player.querySelector('.player-nav.next').addEventListener('click',nextSlide);
@@ -777,6 +779,7 @@ const sections = [
     if(e.key==='Escape') closePlayer();
     else if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();nextSlide();}
     else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prevSlide();}
+    else if(e.key==='Home'){e.preventDefault();pIdx=0;renderPlay();}
   });
 
   // 複製按鈕
